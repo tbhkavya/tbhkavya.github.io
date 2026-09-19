@@ -3,1243 +3,156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Kavya Singhal | XR Developer</title>
-
 <style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#08080a;color:#f5f4ef;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
 
-/* =====================================================
-   BASIC
-===================================================== */
+/* OPENING */
+#intro{position:fixed;inset:0;z-index:9999;background:#08080a;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity .45s ease,visibility .45s ease}
+.name-container{position:relative;width:100%;height:140px;display:flex;justify-content:center;align-items:center;font-size:clamp(45px,9vw,125px);font-weight:700;letter-spacing:-.06em;line-height:1}
+.name-half{position:absolute;width:100%;height:100%;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.name-top{clip-path:inset(0 0 50% 0)}
+.name-bottom{clip-path:inset(50% 0 0 0)}
+.name-half span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap}
+.name-container{opacity:0;transform:scale(.97);animation:nameAppear .55s ease forwards}
+@keyframes nameAppear{to{opacity:1;transform:scale(1)}}
+#intro.split .name-top{transform:translateY(-100vh);transition:transform .55s cubic-bezier(.7,0,.2,1)}
+#intro.split .name-bottom{transform:translateY(100vh);transition:transform .55s cubic-bezier(.7,0,.2,1)}
+#intro.hide{opacity:0;visibility:hidden;pointer-events:none}
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* WEBSITE */
+#website{opacity:0;transform:translateY(15px);transition:opacity .7s ease,transform .7s ease}
+#website.visible{opacity:1;transform:none}
+nav{height:88px;padding:0 6vw;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo{color:white;text-decoration:none;font-size:25px;font-weight:700}
+.logo span{color:#9b7cff}
+.nav-links{display:flex;gap:35px}
+.nav-links a{color:#999;text-decoration:none;font-size:14px}
+.nav-links a:hover{color:white}
+.resume{color:white;text-decoration:none;border:1px solid #303035;padding:10px 17px;border-radius:30px;font-size:13px}
+
+.hero{min-height:calc(100vh - 88px);padding:6vw;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:50px}
+.hero-text{position:relative;z-index:2}
+.kicker{color:#62d8ff;font-family:monospace;font-size:11px;letter-spacing:3px;margin-bottom:25px}
+.hero h1{font-size:clamp(55px,7.5vw,115px);line-height:.88;letter-spacing:-6px;font-weight:700}
+.hero h1 .outline{color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.65)}
+.description{max-width:540px;margin-top:35px;color:#999;font-size:17px;line-height:1.7}
+.buttons{display:flex;gap:12px;margin-top:35px;flex-wrap:wrap}
+.button{text-decoration:none;padding:15px 21px;border-radius:30px;font-size:14px}
+.primary{background:#f5f4ef;color:#08080a}
+.secondary{color:white;border:1px solid #303035}
+
+.photo-area{height:600px;position:relative;display:flex;align-items:center;justify-content:center}
+.photo-glow{position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(155,124,255,.4),transparent 70%);filter:blur(45px);animation:glow 5s ease-in-out infinite}
+.photo-frame{position:relative;z-index:3;width:min(370px,72%);height:500px;overflow:hidden;border-radius:190px 190px 25px 25px;border:1px solid rgba(255,255,255,.12);background:#15151a;box-shadow:0 30px 100px rgba(0,0,0,.6)}
+.photo-frame img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease}
+.photo-frame:hover img{transform:scale(1.04)}
+
+/* DECORATIVE PARTICLE/ORBIT EFFECT — shifted DOWN */
+.orbit{position:absolute;width:500px;height:180px;top:64%;left:50%;border:1px solid rgba(155,124,255,.25);border-radius:50%;transform:translate(-50%,-50%) rotate(-25deg);animation:orbit 18s linear infinite}
+.orbit.two{width:430px;height:140px;top:69%;left:50%;border-color:rgba(98,216,255,.15);transform:translate(-50%,-50%) rotate(30deg);animation:orbitTwo 20s linear infinite}
+
+.label{position:absolute;z-index:5;padding:9px 12px;border:1px solid rgba(255,255,255,.12);background:rgba(10,10,13,.8);backdrop-filter:blur(10px);color:#aaa;font-family:monospace;font-size:10px;letter-spacing:1px}
+.label.one{top:18%;left:2%}
+.label.two{bottom:18%;right:0}
+.label.three{top:8%;right:5%;color:#62d8ff}
+
+.section{min-height:80vh;padding:120px 6vw;border-top:1px solid rgba(255,255,255,.08)}
+.section-label{color:#62d8ff;font-family:monospace;font-size:11px;letter-spacing:3px}
+.section h2{font-size:clamp(55px,8vw,110px);line-height:.9;letter-spacing:-5px;margin-top:25px}
+.section h2 span{color:#666}
+
+@keyframes glow{0%,100%{transform:scale(.95);opacity:.6}50%{transform:scale(1.08);opacity:.9}}
+@keyframes orbit{from{transform:translate(-50%,-50%) rotate(-25deg)}to{transform:translate(-50%,-50%) rotate(335deg)}}
+@keyframes orbitTwo{from{transform:translate(-50%,-50%) rotate(30deg)}to{transform:translate(-50%,-50%) rotate(-330deg)}}
+
+@media(max-width:850px){
+.nav-links{display:none}
+.hero{grid-template-columns:1fr;padding:70px 6vw}
+.photo-area{height:520px}
+.photo-frame{width:300px;height:420px}
+.orbit{width:360px}
+.name-container{font-size:12vw}
 }
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    background: #08080a;
-    color: #f5f4ef;
-    font-family: Arial, Helvetica, sans-serif;
-    overflow-x: hidden;
-}
-
-
-/* =====================================================
-   OPENING SCREEN
-===================================================== */
-
-#intro {
-    position: fixed;
-    inset: 0;
-
-    z-index: 9999;
-
-    background: #08080a;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-
-    transition:
-        opacity 0.45s ease,
-        visibility 0.45s ease;
-}
-
-
-/* The name container */
-
-.name-container {
-
-    position: relative;
-
-    width: 100%;
-    height: 140px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: clamp(45px, 9vw, 125px);
-
-    font-weight: 700;
-
-    letter-spacing: -0.06em;
-
-    line-height: 1;
-
-}
-
-
-/*
-    Both pieces contain exactly the same text.
-
-    We clip them horizontally.
-*/
-
-.name-half {
-
-    position: absolute;
-
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-
-    overflow: hidden;
-
-}
-
-
-/* TOP HALF */
-
-.name-top {
-
-    clip-path: inset(0 0 50% 0);
-
-}
-
-
-/* BOTTOM HALF */
-
-.name-bottom {
-
-    clip-path: inset(50% 0 0 0);
-
-}
-
-
-/*
-    The text itself must have exactly
-    the same position in both copies.
-*/
-
-.name-half span {
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    white-space: nowrap;
-
-}
-
-
-/* Initial appearance */
-
-.name-container {
-
-    opacity: 0;
-
-    transform: scale(.97);
-
-    animation:
-        nameAppear
-        .55s
-        ease
-        forwards;
-
-}
-
-
-@keyframes nameAppear {
-
-    from {
-        opacity: 0;
-        transform: scale(.97);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-}
-
-
-/* =====================================================
-   THE ACTUAL SPLIT
-===================================================== */
-
-#intro.split .name-top {
-
-    transform:
-        translateY(-100vh);
-
-    transition:
-        transform .55s cubic-bezier(.7,0,.2,1);
-
-}
-
-
-#intro.split .name-bottom {
-
-    transform:
-        translateY(100vh);
-
-    transition:
-        transform .55s cubic-bezier(.7,0,.2,1);
-
-}
-
-
-/* =====================================================
-   HIDE INTRO
-===================================================== */
-
-#intro.hide {
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
-}
-
-
-/* =====================================================
-   MAIN WEBSITE
-===================================================== */
-
-#website {
-
-    opacity: 0;
-
-    transform: translateY(15px);
-
-    transition:
-        opacity .7s ease,
-        transform .7s ease;
-
-}
-
-
-#website.visible {
-
-    opacity: 1;
-
-    transform: translateY(0);
-
-}
-
-
-/* =====================================================
-   NAVBAR
-===================================================== */
-
-nav {
-
-    height: 88px;
-
-    padding:
-        0 6vw;
-
-    display:
-
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    border-bottom:
-        1px solid
-        rgba(255,255,255,.08);
-
-}
-
-
-.logo {
-
-    color: white;
-
-    text-decoration: none;
-
-    font-size: 25px;
-
-    font-weight: 700;
-
-}
-
-
-.logo span {
-
-    color: #9b7cff;
-
-}
-
-
-.nav-links {
-
-    display: flex;
-
-    gap: 35px;
-
-}
-
-
-.nav-links a {
-
-    color: #999;
-
-    text-decoration: none;
-
-    font-size: 14px;
-
-    transition:
-        color .2s ease;
-
-}
-
-
-.nav-links a:hover {
-
-    color: white;
-
-}
-
-
-.resume {
-
-    color: white;
-
-    text-decoration: none;
-
-    border:
-        1px solid #303035;
-
-    padding:
-        10px 17px;
-
-    border-radius:
-        30px;
-
-    font-size: 13px;
-
-}
-
-
-/* =====================================================
-   HERO
-===================================================== */
-
-.hero {
-
-    min-height:
-        calc(100vh - 88px);
-
-    padding:
-        6vw;
-
-    display:
-        grid;
-
-    grid-template-columns:
-        1.05fr .95fr;
-
-    align-items:
-        center;
-
-    gap:
-        50px;
-
-}
-
-
-/* =====================================================
-   HERO TEXT
-===================================================== */
-
-.hero-text {
-
-    position:
-        relative;
-
-    z-index:
-        2;
-
-}
-
-
-.kicker {
-
-    color:
-        #62d8ff;
-
-    font-family:
-        monospace;
-
-    font-size:
-        11px;
-
-    letter-spacing:
-        3px;
-
-    margin-bottom:
-        25px;
-
-}
-
-
-.hero h1 {
-
-    font-size:
-        clamp(55px, 7.5vw, 115px);
-
-    line-height:
-        .88;
-
-    letter-spacing:
-        -6px;
-
-    font-weight:
-        700;
-
-}
-
-
-.hero h1 .outline {
-
-    color:
-        transparent;
-
-    -webkit-text-stroke:
-        1px rgba(255,255,255,.65);
-
-}
-
-
-.description {
-
-    max-width:
-        540px;
-
-    margin-top:
-        35px;
-
-    color:
-        #999;
-
-    font-size:
-        17px;
-
-    line-height:
-        1.7;
-
-}
-
-
-.buttons {
-
-    display:
-        flex;
-
-    gap:
-        12px;
-
-    margin-top:
-        35px;
-
-    flex-wrap:
-        wrap;
-
-}
-
-
-.button {
-
-    text-decoration:
-        none;
-
-    padding:
-        15px 21px;
-
-    border-radius:
-        30px;
-
-    font-size:
-        14px;
-
-}
-
-
-.primary {
-
-    background:
-        #f5f4ef;
-
-    color:
-        #08080a;
-
-}
-
-
-.secondary {
-
-    color:
-        white;
-
-    border:
-        1px solid #303035;
-
-}
-
-
-/* =====================================================
-   PHOTO
-===================================================== */
-
-.photo-area {
-
-    height:
-        600px;
-
-    position:
-        relative;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-}
-
-
-/* Glow */
-
-.photo-glow {
-
-    position:
-        absolute;
-
-    width:
-        380px;
-
-    height:
-        380px;
-
-    border-radius:
-        50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(155,124,255,.4),
-            transparent 70%
-        );
-
-    filter:
-        blur(45px);
-
-    animation:
-        glow 5s ease-in-out infinite;
-
-}
-
-
-/* Photo */
-
-.photo-frame {
-
-    position:
-        relative;
-
-    z-index:
-        3;
-
-    width:
-        min(370px, 72%);
-
-    height:
-        500px;
-
-    overflow:
-        hidden;
-
-    border-radius:
-        190px
-        190px
-        25px
-        25px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.12);
-
-    background:
-        #15151a;
-
-    box-shadow:
-        0 30px 100px
-        rgba(0,0,0,.6);
-
-}
-
-
-.photo-frame img {
-
-    width:
-        100%;
-
-    height:
-        100%;
-
-    object-fit:
-        cover;
-
-    display:
-        block;
-
-    transition:
-        transform .7s ease;
-
-}
-
-
-.photo-frame:hover img {
-
-    transform:
-        scale(1.04);
-
-}
-
-
-/* =====================================================
-   ORBITS
-===================================================== */
-
-.orbit {
-
-    position:
-        absolute;
-
-    width:
-        500px;
-
-    height:
-        180px;
-
-    border:
-        1px solid
-        rgba(155,124,255,.25);
-
-    border-radius:
-        50%;
-
-    transform:
-        rotate(-25deg);
-
-    animation:
-        orbit 18s linear infinite;
-
-}
-
-
-.orbit.two {
-
-    width:
-        430px;
-
-    height:
-        140px;
-
-    border-color:
-        rgba(98,216,255,.15);
-
-    transform:
-        rotate(30deg);
-
-    animation:
-        orbitTwo 20s linear infinite;
-
-}
-
-
-/* =====================================================
-   FLOATING LABELS
-===================================================== */
-
-.label {
-
-    position:
-        absolute;
-
-    z-index:
-        5;
-
-    padding:
-        9px 12px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.12);
-
-    background:
-        rgba(10,10,13,.8);
-
-    backdrop-filter:
-        blur(10px);
-
-    color:
-        #aaa;
-
-    font-family:
-        monospace;
-
-    font-size:
-        10px;
-
-    letter-spacing:
-        1px;
-
-}
-
-
-.label.one {
-
-    top:
-        18%;
-
-    left:
-        2%;
-
-}
-
-
-.label.two {
-
-    bottom:
-        18%;
-
-    right:
-        0;
-
-}
-
-
-.label.three {
-
-    top:
-        8%;
-
-    right:
-        5%;
-
-    color:
-        #62d8ff;
-
-}
-
-
-/* =====================================================
-   PROJECTS
-===================================================== */
-
-.section {
-
-    min-height:
-        80vh;
-
-    padding:
-        120px 6vw;
-
-    border-top:
-        1px solid
-        rgba(255,255,255,.08);
-
-}
-
-
-.section-label {
-
-    color:
-        #62d8ff;
-
-    font-family:
-        monospace;
-
-    font-size:
-        11px;
-
-    letter-spacing:
-        3px;
-
-}
-
-
-.section h2 {
-
-    font-size:
-        clamp(55px, 8vw, 110px);
-
-    line-height:
-        .9;
-
-    letter-spacing:
-        -5px;
-
-    margin-top:
-        25px;
-
-}
-
-
-.section h2 span {
-
-    color:
-        #666;
-
-}
-
-
-/* =====================================================
-   ANIMATIONS
-===================================================== */
-
-@keyframes glow {
-
-    0%,100% {
-        transform: scale(.95);
-        opacity: .6;
-    }
-
-    50% {
-        transform: scale(1.08);
-        opacity: .9;
-    }
-
-}
-
-
-@keyframes orbit {
-
-    to {
-        transform:
-            rotate(335deg);
-    }
-
-}
-
-
-@keyframes orbitTwo {
-
-    to {
-        transform:
-            rotate(-330deg);
-    }
-
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media(max-width:850px) {
-
-    .nav-links {
-        display: none;
-    }
-
-
-    .hero {
-
-        grid-template-columns:
-            1fr;
-
-        padding:
-            70px 6vw;
-
-    }
-
-
-    .photo-area {
-
-        height:
-            520px;
-
-    }
-
-
-    .photo-frame {
-
-        width:
-            300px;
-
-        height:
-            420px;
-
-    }
-
-
-    .orbit {
-
-        width:
-            360px;
-
-    }
-
-
-    .name-container {
-
-        font-size:
-            12vw;
-
-    }
-
-}
-
 </style>
 </head>
-
-
 <body>
 
-
-<!-- =====================================================
-     OPENING
-===================================================== -->
-
 <div id="intro">
-
-    <div class="name-container">
-
-        <!-- TOP HALF -->
-
-        <div class="name-half name-top">
-
-            <span>
-                KAVYA SINGHAL
-            </span>
-
-        </div>
-
-
-        <!-- BOTTOM HALF -->
-
-        <div class="name-half name-bottom">
-
-            <span>
-                KAVYA SINGHAL
-            </span>
-
-        </div>
-
-    </div>
-
+  <div class="name-container">
+    <div class="name-half name-top"><span>KAVYA SINGHAL</span></div>
+    <div class="name-half name-bottom"><span>KAVYA SINGHAL</span></div>
+  </div>
 </div>
-
-
-
-<!-- =====================================================
-     WEBSITE
-===================================================== -->
 
 <div id="website">
-
-
-<!-- NAV -->
-
 <nav>
-
-    <a href="#" class="logo">
-
-        KS<span>.</span>
-
-    </a>
-
-
-    <div class="nav-links">
-
-        <a href="#work">
-            Work
-        </a>
-
-        <a href="#about">
-            About
-        </a>
-
-        <a href="#contact">
-            Contact
-        </a>
-
-    </div>
-
-
-    <a href="#" class="resume">
-
-        Resume ↗
-
-    </a>
-
+  <a href="#" class="logo">KS<span>.</span></a>
+  <div class="nav-links">
+    <a href="#work">Work</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#" class="resume">Resume ↗</a>
 </nav>
 
-
-
-<!-- HERO -->
-
 <section class="hero">
-
-
-    <!-- TEXT -->
-
-    <div class="hero-text">
-
-        <div class="kicker">
-
-            XR DEVELOPER · UNITY DEVELOPER · GAME DEVELOPER
-
-        </div>
-
-
-        <h1>
-
-            I Build<br>
-
-            <span class="outline">
-                Worlds Beyond
-            </span><br>
-
-            Reality.
-
-        </h1>
-
-
-        <p class="description">
-
-            I create immersive experiences,
-            interactive applications and games
-            using Unity, AR/VR and 3D technologies.
-
-        </p>
-
-
-        <div class="buttons">
-
-            <a
-                href="#work"
-                class="button primary"
-            >
-                Explore My Work →
-            </a>
-
-
-            <a
-                href="#contact"
-                class="button secondary"
-            >
-                Let's Connect
-            </a>
-
-        </div>
-
+  <div class="hero-text">
+    <div class="kicker">XR DEVELOPER · UNITY DEVELOPER · GAME DEVELOPER</div>
+    <h1>I Build<br><span class="outline">Worlds Beyond</span><br>Reality.</h1>
+    <p class="description">I create immersive experiences, interactive applications and games using Unity, AR/VR and 3D technologies.</p>
+    <div class="buttons">
+      <a href="#work" class="button primary">Explore My Work →</a>
+      <a href="#contact" class="button secondary">Let's Connect</a>
     </div>
+  </div>
 
-
-
-    <!-- PHOTO -->
-
-    <div class="photo-area">
-
-
-        <div class="photo-glow"></div>
-
-
-        <div class="orbit"></div>
-
-        <div class="orbit two"></div>
-
-
-        <div class="label one">
-
-            UNITY / C#
-
-        </div>
-
-
-        <div class="label two">
-
-            AR · VR · XR
-
-        </div>
-
-
-        <div class="label three">
-
-            3D / INTERACTIVE
-
-        </div>
-
-
-        <div class="photo-frame">
-
-            <img
-    src="profile.jpeg"
-    alt="Kavya Singhal"
-    onerror="this.style.display='none'"
-            >
-
-        </div>
-
-
+  <div class="photo-area">
+    <div class="photo-glow"></div>
+    <div class="orbit"></div>
+    <div class="orbit two"></div>
+    <div class="label one">UNITY / C#</div>
+    <div class="label two">AR · VR · XR</div>
+    <div class="label three">3D / INTERACTIVE</div>
+    <div class="photo-frame">
+      <img src="profile.jpeg" alt="Kavya Singhal">
     </div>
-
-
+  </div>
 </section>
 
-
-
-<!-- PROJECTS -->
-
-<section
-    class="section"
-    id="work"
->
-
-    <div class="section-label">
-
-        01 — SELECTED WORK
-
-    </div>
-
-
-    <h2>
-
-        Things I've<br>
-
-        <span>built.</span>
-
-    </h2>
-
+<section class="section" id="work">
+  <div class="section-label">01 — SELECTED WORK</div>
+  <h2>Things I've<br><span>built.</span></h2>
 </section>
 
-
-
-<!-- ABOUT -->
-
-<section
-    class="section"
-    id="about"
->
-
-    <div class="section-label">
-
-        02 — ABOUT ME
-
-    </div>
-
-
-    <h2>
-
-        Creating<br>
-
-        <span>immersive experiences.</span>
-
-    </h2>
-
+<section class="section" id="about">
+  <div class="section-label">02 — ABOUT ME</div>
+  <h2>Creating<br><span>immersive experiences.</span></h2>
 </section>
 
-
-
-<!-- CONTACT -->
-
-<section
-    class="section"
-    id="contact"
->
-
-    <div class="section-label">
-
-        03 — CONTACT
-
-    </div>
-
-
-    <h2>
-
-        Let's build<br>
-
-        <span>something.</span>
-
-    </h2>
-
+<section class="section" id="contact">
+  <div class="section-label">03 — CONTACT</div>
+  <h2>Let's build<br><span>something.</span></h2>
 </section>
-
-
 </div>
 
-
-
-<!-- =====================================================
-     OPENING JAVASCRIPT
-===================================================== -->
-
 <script>
+window.addEventListener("load",function(){
+  const intro=document.getElementById("intro");
+  const website=document.getElementById("website");
 
-window.addEventListener("load", function () {
+  setTimeout(function(){
+    intro.classList.add("split");
+    website.classList.add("visible");
+  },950);
 
-    const intro =
-        document.getElementById("intro");
-
-    const website =
-        document.getElementById("website");
-
-
-    /*
-        0.00s
-        KAVYA SINGHAL appears
-
-        0.95s
-        horizontal split starts
-
-        1.45s
-        website appears
-
-        1.90s
-        intro completely disappears
-    */
-
-
-    setTimeout(function () {
-
-        intro.classList.add("split");
-
-        website.classList.add("visible");
-
-    }, 950);
-
-
-    setTimeout(function () {
-
-        intro.classList.add("hide");
-
-    }, 1900);
-
+  setTimeout(function(){
+    intro.classList.add("hide");
+  },1900);
 });
-
 </script>
-
 
 </body>
 </html>
