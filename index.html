@@ -3,804 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Kavya Singhal | XR Developer</title>
-
 <style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#070709;color:#f5f4ef;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ---------- OPENING ---------- */
+#intro{
+  position:fixed;inset:0;z-index:9999;background:#070709;
+  display:grid;place-items:center;
+  transition:opacity .9s ease,visibility .9s ease;
+}
+.intro-name{
+  position:relative;
+  width:min(90vw,1100px);
+  height:1.05em;
+  font-size:clamp(48px,9vw,132px);
+  font-weight:700;
+  letter-spacing:-.065em;
+  line-height:1;
+  white-space:nowrap;
+  display:flex;
+  justify-content:center;
+}
+.word{position:relative;display:block}
+
+/* Two identical copies. Each is clipped to one half. */
+.half{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:50%;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  transition:
+    transform 1.15s cubic-bezier(.76,0,.18,1),
+    opacity .65s ease;
+}
+.half span{
+  display:block;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  white-space:nowrap;
+}
+.top{top:0;align-items:flex-start}
+.top span{top:0}
+.bottom{bottom:0;align-items:flex-end}
+.bottom span{bottom:0}
+
+/* The normal full name is invisible until after the split. */
+.center-name{
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .8s ease,transform .8s ease;
+  display:flex;
+  justify-content:center;
 }
 
-html {
-    scroll-behavior: smooth;
+/* Split: top half leaves upward, bottom half downward. */
+#intro.split .top{
+  transform:translateY(-52vh);
+  opacity:0;
+}
+#intro.split .bottom{
+  transform:translateY(52vh);
+  opacity:0;
 }
 
-body {
-    background: #070709;
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
-    overflow-x: hidden;
+/* Website reveals underneath while halves leave. */
+#intro.split + .site{
+  opacity:1;
+  transform:translateY(0);
 }
 
+/* Remove intro after animation */
+#intro.hide{opacity:0;visibility:hidden;pointer-events:none}
 
-/* =========================
-   INTRO
-========================= */
-
-#intro {
-    position: fixed;
-    inset: 0;
-    background: #070709;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    z-index: 9999;
-
-    transition:
-        opacity 0.8s ease,
-        visibility 0.8s ease;
+/* ---------- SITE ---------- */
+.site{
+  opacity:0;
+  transform:translateY(18px);
+  transition:opacity 1.1s ease,transform 1.1s ease;
 }
-
-
-/* The complete name */
-
-.name {
-    display: flex;
-
-    font-size: clamp(55px, 10vw, 150px);
-
-    font-weight: 700;
-
-    letter-spacing: -6px;
-
-    white-space: nowrap;
-
-    position: relative;
+nav{
+  height:88px;padding:0 6vw;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid #202024;
 }
+.logo{font-size:25px;font-weight:700}.logo b{color:#9b7cff}
+.links{display:flex;gap:34px}
+.links a,.resume{color:#a5a4aa;text-decoration:none;font-size:14px}
+.links a:hover,.resume:hover{color:#fff}
+.resume{border:1px solid #303035;padding:10px 17px;border-radius:30px;color:#fff}
 
-
-/* Individual words */
-
-.name span {
-
-    display: block;
-
-    transition:
-        transform 1.2s cubic-bezier(.77,0,.18,1),
-        opacity 0.8s ease;
+.hero{
+  min-height:calc(100vh - 88px);padding:7vw 6vw;
+  display:flex;align-items:center;justify-content:space-between;gap:50px;
 }
+.hero-copy{max-width:760px}
+.kicker{font-size:11px;letter-spacing:3px;color:#62d8ff;margin-bottom:25px}
+h1{font-size:clamp(55px,8vw,120px);line-height:.9;letter-spacing:-.065em}
+h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px #aaa}
+.description{max-width:540px;color:#999;font-size:18px;line-height:1.7;margin-top:34px}
+.actions{display:flex;gap:13px;margin-top:34px;flex-wrap:wrap}
+.btn{padding:15px 21px;border-radius:30px;text-decoration:none;font-size:14px}
+.primary{background:#f5f4ef;color:#09090b}
+.secondary{border:1px solid #303035;color:#fff}
 
-
-/* =========================
-   INITIAL APPEAR
-========================= */
-
-.name {
-
-    opacity: 0;
-
-    transform: scale(.96);
-
-    animation: appear 1s ease forwards;
-
+.visual{
+  width:min(40vw,430px);height:min(40vw,430px);min-width:280px;min-height:280px;
+  position:relative;display:grid;place-items:center;
 }
-
-
-@keyframes appear {
-
-    to {
-
-        opacity: 1;
-
-        transform: scale(1);
-
-    }
-
+.orb{
+  width:50%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#e2dbff 0,#9b7cff 25%,#38236c 55%,#08070d 74%);
+  box-shadow:0 0 90px rgba(155,124,255,.3);
+  animation:float 5s ease-in-out infinite;z-index:2;
 }
+.ring{position:absolute;width:82%;height:82%;border:1px solid #6650a5;border-radius:50%;transform:rotate(25deg);animation:spin 15s linear infinite}
+.ring.two{width:96%;height:38%;border-color:#285f71;animation:spin2 18s linear infinite}
+@keyframes float{50%{transform:translateY(-18px)}}
+@keyframes spin{to{transform:rotate(385deg)}}
+@keyframes spin2{to{transform:rotate(-335deg)}}
 
+.section{min-height:75vh;padding:10vw 6vw;border-top:1px solid #202024}
+.section small{color:#62d8ff;letter-spacing:3px}
+.section h2{font-size:clamp(50px,8vw,110px);line-height:.9;margin-top:25px}
+.section h2 span{color:#777}
 
-/* =========================
-   SPLIT
-========================= */
+footer{padding:28px 6vw;border-top:1px solid #202024;color:#777;font-size:11px;display:flex;justify-content:space-between}
 
-
-/* left */
-
-#intro.split .first {
-
-    transform:
-        translateX(-55vw)
-        rotate(-4deg);
-
-    opacity: 0;
-
+@media(max-width:800px){
+  .links{display:none}
+  .hero{flex-direction:column;align-items:flex-start;padding-top:12vw}
+  .visual{align-self:center;width:330px;height:330px}
+  .intro-name{font-size:12vw}
+  footer{gap:12px;flex-direction:column}
 }
-
-
-/* right */
-
-#intro.split .last {
-
-    transform:
-        translateX(55vw)
-        rotate(4deg);
-
-    opacity: 0;
-
-}
-
-
-/* vertical dividing line */
-
-.split-line {
-
-    position: absolute;
-
-    width: 1px;
-
-    height: 0;
-
-    background: white;
-
-    left: 50%;
-
-    top: 50%;
-
-    transform: translate(-50%, -50%);
-
-    transition:
-
-        height 0.6s ease;
-
-}
-
-
-#intro.split .split-line {
-
-    height: 120vh;
-
-}
-
-
-/* =========================
-   HIDE INTRO
-========================= */
-
-#intro.hide {
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
-}
-
-
-/* =========================
-   WEBSITE
-========================= */
-
-.website {
-
-    opacity: 0;
-
-    transform: translateY(20px);
-
-    transition:
-
-        opacity 1s ease,
-
-        transform 1s ease;
-
-}
-
-
-.website.show {
-
-    opacity: 1;
-
-    transform: translateY(0);
-
-}
-
-
-/* =========================
-   NAVBAR
-========================= */
-
-nav {
-
-    height: 90px;
-
-    padding: 0 6vw;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    border-bottom: 1px solid #222;
-
-}
-
-
-.logo {
-
-    font-size: 24px;
-
-    font-weight: bold;
-
-}
-
-
-.logo span {
-
-    color: #9b7cff;
-
-}
-
-
-.links {
-
-    display: flex;
-
-    gap: 35px;
-
-}
-
-
-.links a {
-
-    color: #aaa;
-
-    text-decoration: none;
-
-    font-size: 14px;
-
-}
-
-
-.links a:hover {
-
-    color: white;
-
-}
-
-
-.resume {
-
-    border: 1px solid #333;
-
-    padding: 10px 17px;
-
-    border-radius: 30px;
-
-    color: white;
-
-    text-decoration: none;
-
-}
-
-
-/* =========================
-   HERO
-========================= */
-
-.hero {
-
-    min-height: calc(100vh - 90px);
-
-    padding: 8vw 6vw;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 50px;
-
-}
-
-
-.hero-text {
-
-    max-width: 750px;
-
-}
-
-
-.small {
-
-    color: #62d8ff;
-
-    font-size: 12px;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 25px;
-
-}
-
-
-h1 {
-
-    font-size: clamp(55px, 8vw, 120px);
-
-    line-height: .9;
-
-    letter-spacing: -6px;
-
-}
-
-
-h1 span {
-
-    color: transparent;
-
-    -webkit-text-stroke: 1px #aaa;
-
-}
-
-
-.description {
-
-    color: #999;
-
-    font-size: 18px;
-
-    line-height: 1.7;
-
-    max-width: 520px;
-
-    margin-top: 35px;
-
-}
-
-
-.buttons {
-
-    display: flex;
-
-    gap: 15px;
-
-    margin-top: 35px;
-
-}
-
-
-.button {
-
-    padding: 15px 22px;
-
-    border-radius: 30px;
-
-    text-decoration: none;
-
-    font-size: 14px;
-
-}
-
-
-.primary {
-
-    background: white;
-
-    color: black;
-
-}
-
-
-.secondary {
-
-    border: 1px solid #333;
-
-    color: white;
-
-}
-
-
-/* =========================
-   VISUAL
-========================= */
-
-.visual {
-
-    width: 400px;
-
-    height: 400px;
-
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-}
-
-
-.orb {
-
-    width: 200px;
-
-    height: 200px;
-
-    border-radius: 50%;
-
-    background:
-
-        radial-gradient(
-
-            circle at 35% 30%,
-
-            #ddd,
-
-            #9b7cff 25%,
-
-            #39246b 55%,
-
-            #08070d 75%
-
-        );
-
-    box-shadow:
-
-        0 0 80px rgba(155,124,255,.35);
-
-    animation: float 5s ease-in-out infinite;
-
-}
-
-
-.ring {
-
-    position: absolute;
-
-    width: 330px;
-
-    height: 330px;
-
-    border: 1px solid #6b56aa;
-
-    border-radius: 50%;
-
-    transform: rotate(25deg);
-
-    animation: rotate 15s linear infinite;
-
-}
-
-
-.ring2 {
-
-    width: 390px;
-
-    height: 150px;
-
-    border-color: #28687c;
-
-}
-
-
-@keyframes float {
-
-    50% {
-
-        transform: translateY(-20px);
-
-    }
-
-}
-
-
-@keyframes rotate {
-
-    to {
-
-        transform:
-
-            rotate(385deg);
-
-    }
-
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:800px) {
-
-    .links {
-
-        display: none;
-
-    }
-
-
-    .hero {
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-    }
-
-
-    .visual {
-
-        width: 100%;
-
-        height: 300px;
-
-    }
-
-
-    .name {
-
-        font-size: 12vw;
-
-        letter-spacing: -3px;
-
-    }
-
-}
-
 </style>
 </head>
 
-
 <body>
 
-
-<!-- =====================================
-     OPENING
-===================================== -->
-
 <div id="intro">
+  <div class="intro-name" aria-label="Kavya Singhal">
 
-    <div class="name">
-
-        <span class="first">KAVYA</span>
-
-        <span>&nbsp;</span>
-
-        <span class="last">SINGHAL</span>
-
+    <!-- Upper clipped copy -->
+    <div class="half top">
+      <span>KAVYA SINGHAL</span>
     </div>
 
+    <!-- Lower clipped copy -->
+    <div class="half bottom">
+      <span>KAVYA SINGHAL</span>
+    </div>
 
-    <div class="split-line"></div>
-
+  </div>
 </div>
 
-
-
-<!-- =====================================
-     WEBSITE
-===================================== -->
-
-<div class="website" id="website">
-
+<div class="site">
 
 <nav>
-
-    <div class="logo">
-
-        KS<span>.</span>
-
-    </div>
-
-
-    <div class="links">
-
-        <a href="#work">Work</a>
-
-        <a href="#about">About</a>
-
-        <a href="#contact">Contact</a>
-
-    </div>
-
-
-    <a class="resume" href="#">
-
-        Resume ↗
-
-    </a>
-
+  <div class="logo">KS<b>.</b></div>
+  <div class="links">
+    <a href="#work">Work</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a class="resume" href="#">Resume ↗</a>
 </nav>
 
-
-
 <section class="hero">
-
-
-    <div class="hero-text">
-
-
-        <div class="small">
-
-            XR DEVELOPER · UNITY DEVELOPER · GAME DEVELOPER
-
-        </div>
-
-
-        <h1>
-
-            I Build<br>
-
-            <span>Worlds Beyond</span><br>
-
-            Reality.
-
-        </h1>
-
-
-        <p class="description">
-
-            I create immersive experiences, interactive applications,
-
-            and games using Unity, AR/VR and 3D technologies.
-
-        </p>
-
-
-        <div class="buttons">
-
-            <a class="button primary" href="#work">
-
-                Explore My Work →
-
-            </a>
-
-
-            <a class="button secondary" href="#contact">
-
-                Let's Connect
-
-            </a>
-
-        </div>
-
-
+  <div class="hero-copy">
+    <div class="kicker">XR DEVELOPER · UNITY DEVELOPER · GAME DEVELOPER</div>
+    <h1>I Build<br><em>Worlds Beyond</em><br>Reality.</h1>
+    <p class="description">I create immersive experiences, interactive applications, and games using Unity, AR/VR and 3D technologies.</p>
+    <div class="actions">
+      <a class="btn primary" href="#work">Explore My Work →</a>
+      <a class="btn secondary" href="#contact">Let's Connect</a>
     </div>
+  </div>
 
-
-
-    <div class="visual">
-
-        <div class="ring"></div>
-
-        <div class="ring ring2"></div>
-
-        <div class="orb"></div>
-
-    </div>
-
-
+  <div class="visual" aria-hidden="true">
+    <div class="ring"></div>
+    <div class="ring two"></div>
+    <div class="orb"></div>
+  </div>
 </section>
 
-
-<section id="work" style="height:70vh;padding:10vw 6vw;border-top:1px solid #222;">
-
-    <p class="small">01 — WORK</p>
-
-    <h2 style="font-size:8vw;">
-
-        Selected<br>
-
-        Projects.
-
-    </h2>
-
+<section class="section" id="work">
+  <small>01 — WORK</small>
+  <h2>Selected<br><span>Projects.</span></h2>
 </section>
 
-
-<section id="about" style="height:70vh;padding:10vw 6vw;border-top:1px solid #222;">
-
-    <p class="small">02 — ABOUT</p>
-
-    <h2 style="font-size:8vw;">
-
-        Building<br>
-
-        Experiences.
-
-    </h2>
-
+<section class="section" id="about">
+  <small>02 — ABOUT</small>
+  <h2>Building<br><span>Experiences.</span></h2>
 </section>
 
-
-<section id="contact" style="height:70vh;padding:10vw 6vw;border-top:1px solid #222;">
-
-    <p class="small">03 — CONTACT</p>
-
-    <h2 style="font-size:8vw;">
-
-        Let's Build<br>
-
-        Something.
-
-    </h2>
-
+<section class="section" id="contact">
+  <small>03 — CONTACT</small>
+  <h2>Let's Build<br><span>Something.</span></h2>
 </section>
 
+<footer>
+  <span>© 2026 Kavya Singhal</span>
+  <span>XR / Unity / 3D</span>
+</footer>
 
 </div>
 
-
-
 <script>
+window.addEventListener("load", () => {
+  const intro = document.getElementById("intro");
 
+  // Name is visible first. Then the actual letters split horizontally.
+  setTimeout(() => intro.classList.add("split"), 1800);
 
-/*
-
-    ANIMATION TIMELINE
-
-    0s     → name starts appearing
-
-    1.3s   → name is fully visible
-
-    2.2s   → split begins
-
-    3.4s   → name has moved away
-
-    3.6s   → website appears
-
-*/
-
-
-window.addEventListener("load", function() {
-
-
-    const intro = document.getElementById("intro");
-
-    const website = document.getElementById("website");
-
-
-    // Wait until the name is visible
-
-    setTimeout(function() {
-
-        intro.classList.add("split");
-
-    }, 2200);
-
-
-    // Reveal website
-
-    setTimeout(function() {
-
-        website.classList.add("show");
-
-    }, 2900);
-
-
-    // Remove intro completely
-
-    setTimeout(function() {
-
-        intro.classList.add("hide");
-
-    }, 3700);
-
-
+  // Fully remove the intro after the split has completed.
+  setTimeout(() => intro.classList.add("hide"), 3000);
 });
-
-
 </script>
-
 
 </body>
 </html>
