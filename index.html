@@ -4,143 +4,338 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kavya Singhal | XR Developer</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:#070709;color:#f5f4ef;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
 
-/* ---------- OPENING ---------- */
+body{
+    background:#070709;
+    color:#f5f4ef;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+}
+
+/* =========================
+   OPENING
+========================= */
+
 #intro{
-  position:fixed;inset:0;z-index:9999;background:#070709;
-  display:grid;place-items:center;
-  transition:opacity .9s ease,visibility .9s ease;
-}
-.intro-name{
-  position:relative;
-  width:min(90vw,1100px);
-  height:1.05em;
-  font-size:clamp(48px,9vw,132px);
-  font-weight:700;
-  letter-spacing:-.065em;
-  line-height:1;
-  white-space:nowrap;
-  display:flex;
-  justify-content:center;
-}
-.word{position:relative;display:block}
-
-/* Two identical copies. Each is clipped to one half. */
-.half{
-  position:absolute;
-  left:0;
-  width:100%;
-  height:50%;
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  transition:
-    transform 1.15s cubic-bezier(.76,0,.18,1),
-    opacity .65s ease;
-}
-.half span{
-  display:block;
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  white-space:nowrap;
-}
-.top{top:0;align-items:flex-start}
-.top span{top:0}
-.bottom{bottom:0;align-items:flex-end}
-.bottom span{bottom:0}
-
-/* The normal full name is invisible until after the split. */
-.center-name{
-  opacity:0;
-  transform:translateY(14px);
-  transition:opacity .8s ease,transform .8s ease;
-  display:flex;
-  justify-content:center;
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:#070709;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    transition:opacity .55s ease, visibility .55s ease;
 }
 
-/* Split: top half leaves upward, bottom half downward. */
+/*
+  One exact text shape is duplicated.
+  Each copy is clipped to exactly half of the letters.
+  This prevents the jagged/overlapping look from the previous version.
+*/
+
+.split-name{
+    position:relative;
+    width:100%;
+    height:1em;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:clamp(46px,8vw,118px);
+    font-weight:700;
+    letter-spacing:-0.065em;
+    line-height:1;
+    white-space:nowrap;
+}
+
+.split-name .half{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    overflow:hidden;
+    transition:
+        transform .55s cubic-bezier(.65,0,.2,1),
+        opacity .35s ease;
+}
+
+.split-name .half span{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform:translateX(-50%);
+    white-space:nowrap;
+}
+
+/* exact 50/50 horizontal crop */
+.half.top{
+    clip-path:inset(0 0 50% 0);
+}
+
+.half.bottom{
+    clip-path:inset(50% 0 0 0);
+}
+
+/* Keep the lower copy aligned exactly with the upper copy */
+.half.bottom span{
+    top:0;
+}
+
+/* Small initial fade-in */
+.split-name .half{
+    opacity:0;
+    animation:appear .45s ease forwards;
+}
+
+.split-name .bottom{
+    animation-delay:.04s;
+}
+
+@keyframes appear{
+    from{opacity:0;transform:scale(.985)}
+    to{opacity:1;transform:scale(1)}
+}
+
+/* The actual split */
 #intro.split .top{
-  transform:translateY(-52vh);
-  opacity:0;
+    transform:translateY(-105vh);
+    opacity:0;
 }
+
 #intro.split .bottom{
-  transform:translateY(52vh);
-  opacity:0;
+    transform:translateY(105vh);
+    opacity:0;
 }
 
-/* Website reveals underneath while halves leave. */
-#intro.split + .site{
-  opacity:1;
-  transform:translateY(0);
+#intro.hide{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
 }
 
-/* Remove intro after animation */
-#intro.hide{opacity:0;visibility:hidden;pointer-events:none}
+/* =========================
+   WEBSITE
+========================= */
 
-/* ---------- SITE ---------- */
 .site{
-  opacity:0;
-  transform:translateY(18px);
-  transition:opacity 1.1s ease,transform 1.1s ease;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .7s ease,transform .7s ease;
 }
+
+.site.show{
+    opacity:1;
+    transform:none;
+}
+
 nav{
-  height:88px;padding:0 6vw;display:flex;align-items:center;
-  justify-content:space-between;border-bottom:1px solid #202024;
+    height:88px;
+    padding:0 6vw;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid #202024;
 }
-.logo{font-size:25px;font-weight:700}.logo b{color:#9b7cff}
-.links{display:flex;gap:34px}
-.links a,.resume{color:#a5a4aa;text-decoration:none;font-size:14px}
-.links a:hover,.resume:hover{color:#fff}
-.resume{border:1px solid #303035;padding:10px 17px;border-radius:30px;color:#fff}
+
+.logo{
+    font-size:25px;
+    font-weight:700;
+}
+
+.logo b{
+    color:#9b7cff;
+}
+
+.links{
+    display:flex;
+    gap:34px;
+}
+
+.links a,.resume{
+    color:#a5a4aa;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.links a:hover,.resume:hover{
+    color:#fff;
+}
+
+.resume{
+    border:1px solid #303035;
+    padding:10px 17px;
+    border-radius:30px;
+    color:#fff;
+}
 
 .hero{
-  min-height:calc(100vh - 88px);padding:7vw 6vw;
-  display:flex;align-items:center;justify-content:space-between;gap:50px;
+    min-height:calc(100vh - 88px);
+    padding:7vw 6vw;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:50px;
 }
-.hero-copy{max-width:760px}
-.kicker{font-size:11px;letter-spacing:3px;color:#62d8ff;margin-bottom:25px}
-h1{font-size:clamp(55px,8vw,120px);line-height:.9;letter-spacing:-.065em}
-h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px #aaa}
-.description{max-width:540px;color:#999;font-size:18px;line-height:1.7;margin-top:34px}
-.actions{display:flex;gap:13px;margin-top:34px;flex-wrap:wrap}
-.btn{padding:15px 21px;border-radius:30px;text-decoration:none;font-size:14px}
-.primary{background:#f5f4ef;color:#09090b}
-.secondary{border:1px solid #303035;color:#fff}
+
+.hero-copy{
+    max-width:760px;
+}
+
+.kicker{
+    font-size:11px;
+    letter-spacing:3px;
+    color:#62d8ff;
+    margin-bottom:25px;
+}
+
+h1{
+    font-size:clamp(55px,8vw,120px);
+    line-height:.9;
+    letter-spacing:-.065em;
+}
+
+h1 em{
+    font-style:normal;
+    color:transparent;
+    -webkit-text-stroke:1px #aaa;
+}
+
+.description{
+    max-width:540px;
+    color:#999;
+    font-size:18px;
+    line-height:1.7;
+    margin-top:34px;
+}
+
+.actions{
+    display:flex;
+    gap:13px;
+    margin-top:34px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    padding:15px 21px;
+    border-radius:30px;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.primary{
+    background:#f5f4ef;
+    color:#09090b;
+}
+
+.secondary{
+    border:1px solid #303035;
+    color:#fff;
+}
 
 .visual{
-  width:min(40vw,430px);height:min(40vw,430px);min-width:280px;min-height:280px;
-  position:relative;display:grid;place-items:center;
+    width:min(40vw,430px);
+    height:min(40vw,430px);
+    min-width:280px;
+    min-height:280px;
+    position:relative;
+    display:grid;
+    place-items:center;
 }
+
 .orb{
-  width:50%;aspect-ratio:1;border-radius:50%;
-  background:radial-gradient(circle at 34% 28%,#e2dbff 0,#9b7cff 25%,#38236c 55%,#08070d 74%);
-  box-shadow:0 0 90px rgba(155,124,255,.3);
-  animation:float 5s ease-in-out infinite;z-index:2;
+    width:50%;
+    aspect-ratio:1;
+    border-radius:50%;
+    background:radial-gradient(circle at 34% 28%,#e2dbff 0,#9b7cff 25%,#38236c 55%,#08070d 74%);
+    box-shadow:0 0 90px rgba(155,124,255,.3);
+    animation:float 5s ease-in-out infinite;
+    z-index:2;
 }
-.ring{position:absolute;width:82%;height:82%;border:1px solid #6650a5;border-radius:50%;transform:rotate(25deg);animation:spin 15s linear infinite}
-.ring.two{width:96%;height:38%;border-color:#285f71;animation:spin2 18s linear infinite}
-@keyframes float{50%{transform:translateY(-18px)}}
-@keyframes spin{to{transform:rotate(385deg)}}
-@keyframes spin2{to{transform:rotate(-335deg)}}
 
-.section{min-height:75vh;padding:10vw 6vw;border-top:1px solid #202024}
-.section small{color:#62d8ff;letter-spacing:3px}
-.section h2{font-size:clamp(50px,8vw,110px);line-height:.9;margin-top:25px}
-.section h2 span{color:#777}
+.ring{
+    position:absolute;
+    width:82%;
+    height:82%;
+    border:1px solid #6650a5;
+    border-radius:50%;
+    transform:rotate(25deg);
+    animation:spin 15s linear infinite;
+}
 
-footer{padding:28px 6vw;border-top:1px solid #202024;color:#777;font-size:11px;display:flex;justify-content:space-between}
+.ring.two{
+    width:96%;
+    height:38%;
+    border-color:#285f71;
+    animation:spin2 18s linear infinite;
+}
+
+@keyframes float{
+    50%{transform:translateY(-18px)}
+}
+
+@keyframes spin{
+    to{transform:rotate(385deg)}
+}
+
+@keyframes spin2{
+    to{transform:rotate(-335deg)}
+}
+
+.section{
+    min-height:75vh;
+    padding:10vw 6vw;
+    border-top:1px solid #202024;
+}
+
+.section small{
+    color:#62d8ff;
+    letter-spacing:3px;
+}
+
+.section h2{
+    font-size:clamp(50px,8vw,110px);
+    line-height:.9;
+    margin-top:25px;
+}
+
+.section h2 span{
+    color:#777;
+}
+
+footer{
+    padding:28px 6vw;
+    border-top:1px solid #202024;
+    color:#777;
+    font-size:11px;
+    display:flex;
+    justify-content:space-between;
+}
 
 @media(max-width:800px){
-  .links{display:none}
-  .hero{flex-direction:column;align-items:flex-start;padding-top:12vw}
-  .visual{align-self:center;width:330px;height:330px}
-  .intro-name{font-size:12vw}
-  footer{gap:12px;flex-direction:column}
+    .links{display:none}
+
+    .hero{
+        flex-direction:column;
+        align-items:flex-start;
+        padding-top:12vw;
+    }
+
+    .visual{
+        align-self:center;
+        width:330px;
+        height:330px;
+    }
+
+    .split-name{
+        font-size:12vw;
+    }
+
+    footer{
+        gap:12px;
+        flex-direction:column;
+    }
 }
 </style>
 </head>
@@ -148,82 +343,101 @@ footer{padding:28px 6vw;border-top:1px solid #202024;color:#777;font-size:11px;d
 <body>
 
 <div id="intro">
-  <div class="intro-name" aria-label="Kavya Singhal">
+    <div class="split-name" aria-label="Kavya Singhal">
 
-    <!-- Upper clipped copy -->
-    <div class="half top">
-      <span>KAVYA SINGHAL</span>
+        <div class="half top">
+            <span>KAVYA SINGHAL</span>
+        </div>
+
+        <div class="half bottom">
+            <span>KAVYA SINGHAL</span>
+        </div>
+
     </div>
-
-    <!-- Lower clipped copy -->
-    <div class="half bottom">
-      <span>KAVYA SINGHAL</span>
-    </div>
-
-  </div>
 </div>
 
-<div class="site">
+<div class="site" id="site">
 
 <nav>
-  <div class="logo">KS<b>.</b></div>
-  <div class="links">
-    <a href="#work">Work</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-  </div>
-  <a class="resume" href="#">Resume ↗</a>
+    <div class="logo">KS<b>.</b></div>
+
+    <div class="links">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <a class="resume" href="#">Resume ↗</a>
 </nav>
 
 <section class="hero">
-  <div class="hero-copy">
-    <div class="kicker">XR DEVELOPER · UNITY DEVELOPER · GAME DEVELOPER</div>
-    <h1>I Build<br><em>Worlds Beyond</em><br>Reality.</h1>
-    <p class="description">I create immersive experiences, interactive applications, and games using Unity, AR/VR and 3D technologies.</p>
-    <div class="actions">
-      <a class="btn primary" href="#work">Explore My Work →</a>
-      <a class="btn secondary" href="#contact">Let's Connect</a>
-    </div>
-  </div>
+    <div class="hero-copy">
+        <div class="kicker">XR DEVELOPER · UNITY DEVELOPER · GAME DEVELOPER</div>
 
-  <div class="visual" aria-hidden="true">
-    <div class="ring"></div>
-    <div class="ring two"></div>
-    <div class="orb"></div>
-  </div>
+        <h1>
+            I Build<br>
+            <em>Worlds Beyond</em><br>
+            Reality.
+        </h1>
+
+        <p class="description">
+            I create immersive experiences, interactive applications,
+            and games using Unity, AR/VR and 3D technologies.
+        </p>
+
+        <div class="actions">
+            <a class="btn primary" href="#work">Explore My Work →</a>
+            <a class="btn secondary" href="#contact">Let's Connect</a>
+        </div>
+    </div>
+
+    <div class="visual">
+        <div class="ring"></div>
+        <div class="ring two"></div>
+        <div class="orb"></div>
+    </div>
 </section>
 
 <section class="section" id="work">
-  <small>01 — WORK</small>
-  <h2>Selected<br><span>Projects.</span></h2>
+    <small>01 — WORK</small>
+    <h2>Selected<br><span>Projects.</span></h2>
 </section>
 
 <section class="section" id="about">
-  <small>02 — ABOUT</small>
-  <h2>Building<br><span>Experiences.</span></h2>
+    <small>02 — ABOUT</small>
+    <h2>Building<br><span>Experiences.</span></h2>
 </section>
 
 <section class="section" id="contact">
-  <small>03 — CONTACT</small>
-  <h2>Let's Build<br><span>Something.</span></h2>
+    <small>03 — CONTACT</small>
+    <h2>Let's Build<br><span>Something.</span></h2>
 </section>
 
 <footer>
-  <span>© 2026 Kavya Singhal</span>
-  <span>XR / Unity / 3D</span>
+    <span>© 2026 Kavya Singhal</span>
+    <span>XR / Unity / 3D</span>
 </footer>
 
 </div>
 
 <script>
 window.addEventListener("load", () => {
-  const intro = document.getElementById("intro");
+    const intro = document.getElementById("intro");
+    const site = document.getElementById("site");
 
-  // Name is visible first. Then the actual letters split horizontally.
-  setTimeout(() => intro.classList.add("split"), 1800);
+    // Short, deliberate opening:
+    // 0.00s - name starts appearing
+    // 0.75s - name is fully visible
+    // 1.05s - horizontal split begins
+    // 1.60s - portfolio is visible
+    setTimeout(() => {
+        intro.classList.add("split");
+        site.classList.add("show");
+    }, 1050);
 
-  // Fully remove the intro after the split has completed.
-  setTimeout(() => intro.classList.add("hide"), 3000);
+    setTimeout(() => {
+        intro.classList.add("hide");
+    }, 1750);
 });
 </script>
 
