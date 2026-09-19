@@ -1,832 +1,965 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"
-        content="Kavya Singhal — XR Developer, Unity Developer and Game Developer.">
+<title>Kavya Singhal | XR Developer</title>
 
-    <title>Kavya Singhal — XR Developer</title>
+<style>
 
-    <style>
+/* =====================================================
+   BASIC
+===================================================== */
 
-        /* =========================
-           RESET
-        ========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+html {
+    scroll-behavior: smooth;
+}
 
-        html {
-            scroll-behavior: smooth;
-        }
+body {
+    background: #08080a;
+    color: #f5f4ef;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
 
-        body {
-            background: #070709;
-            color: #f5f4ef;
-            font-family: Arial, Helvetica, sans-serif;
-            overflow-x: hidden;
-        }
 
-        body::selection {
-            background: #9b7cff;
-            color: white;
-        }
+/* =====================================================
+   OPENING SCREEN
+===================================================== */
 
+#intro {
+    position: fixed;
+    inset: 0;
 
-        /* =========================
-           NAVIGATION
-        ========================= */
+    z-index: 9999;
 
-        nav {
-            width: 100%;
-            height: 90px;
+    background: #08080a;
 
-            padding: 0 6vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    overflow: hidden;
 
-            border-bottom: 1px solid rgba(255,255,255,.08);
-        }
+    transition:
+        opacity 0.45s ease,
+        visibility 0.45s ease;
+}
 
-        .logo {
-            color: white;
-            text-decoration: none;
 
-            font-size: 25px;
-            font-weight: 700;
+/* The name container */
 
-            letter-spacing: -1px;
-        }
+.name-container {
 
-        .logo span {
-            color: #9b7cff;
-        }
+    position: relative;
 
-        .nav-links {
-            display: flex;
-            gap: 35px;
-        }
+    width: 100%;
+    height: 140px;
 
-        .nav-links a {
-            color: #888;
-            text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-            font-size: 14px;
+    font-size: clamp(45px, 9vw, 125px);
 
-            transition: color .25s ease;
-        }
+    font-weight: 700;
 
-        .nav-links a:hover {
-            color: white;
-        }
+    letter-spacing: -0.06em;
 
-        .resume-button {
-            color: white;
-            text-decoration: none;
+    line-height: 1;
 
-            border: 1px solid #303035;
+}
 
-            padding: 11px 18px;
 
-            border-radius: 30px;
+/*
+    Both pieces contain exactly the same text.
 
-            font-size: 13px;
+    We clip them horizontally.
+*/
 
-            transition:
-                background .25s ease,
-                border-color .25s ease;
-        }
+.name-half {
 
-        .resume-button:hover {
-            background: white;
-            color: black;
-            border-color: white;
-        }
+    position: absolute;
 
+    width: 100%;
+    height: 100%;
 
-        /* =========================
-           HERO
-        ========================= */
+    display: flex;
 
-        .hero {
+    justify-content: center;
+    align-items: center;
 
-            min-height: calc(100vh - 90px);
+    overflow: hidden;
 
-            padding: 6vw;
+}
 
-            display: grid;
 
-            grid-template-columns:
-                1.1fr
-                .9fr;
+/* TOP HALF */
 
-            align-items: center;
+.name-top {
 
-            gap: 70px;
+    clip-path: inset(0 0 50% 0);
 
-            position: relative;
+}
 
-        }
 
+/* BOTTOM HALF */
 
-        /* subtle background glow */
+.name-bottom {
 
-        .hero::before {
+    clip-path: inset(50% 0 0 0);
 
-            content: "";
+}
 
-            position: absolute;
 
-            width: 500px;
-            height: 500px;
+/*
+    The text itself must have exactly
+    the same position in both copies.
+*/
 
-            right: 10%;
-            top: 10%;
+.name-half span {
 
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(115,80,255,.12),
-                    transparent 70%
-                );
+    position: absolute;
 
-            filter: blur(40px);
+    left: 50%;
+    top: 50%;
 
-            pointer-events: none;
-        }
+    transform:
+        translate(-50%, -50%);
 
+    white-space: nowrap;
 
-        /* =========================
-           LEFT SIDE
-        ========================= */
+}
 
-        .hero-content {
 
-            position: relative;
+/* Initial appearance */
 
-            z-index: 2;
+.name-container {
 
-            animation: heroIn 1s ease forwards;
+    opacity: 0;
 
-        }
+    transform: scale(.97);
 
+    animation:
+        nameAppear
+        .55s
+        ease
+        forwards;
 
-        .eyebrow {
+}
 
-            color: #62d8ff;
 
-            font-size: 11px;
+@keyframes nameAppear {
 
-            letter-spacing: 3px;
+    from {
+        opacity: 0;
+        transform: scale(.97);
+    }
 
-            margin-bottom: 25px;
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 
-        }
+}
 
 
-        .hero h1 {
+/* =====================================================
+   THE ACTUAL SPLIT
+===================================================== */
 
-            font-size:
-                clamp(
-                    55px,
-                    7.8vw,
-                    115px
-                );
+#intro.split .name-top {
 
-            line-height: .88;
+    transform:
+        translateY(-100vh);
 
-            letter-spacing: -6px;
+    transition:
+        transform .55s cubic-bezier(.7,0,.2,1);
 
-            font-weight: 700;
+}
 
-        }
 
+#intro.split .name-bottom {
 
-        .hero h1 .outline {
+    transform:
+        translateY(100vh);
 
-            color: transparent;
+    transition:
+        transform .55s cubic-bezier(.7,0,.2,1);
 
-            -webkit-text-stroke:
-                1px rgba(255,255,255,.65);
+}
 
-        }
 
+/* =====================================================
+   HIDE INTRO
+===================================================== */
 
-        .hero-description {
+#intro.hide {
 
-            max-width: 550px;
+    opacity: 0;
 
-            color: #999;
+    visibility: hidden;
 
-            font-size: 17px;
+    pointer-events: none;
 
-            line-height: 1.7;
+}
 
-            margin-top: 35px;
 
-        }
+/* =====================================================
+   MAIN WEBSITE
+===================================================== */
 
+#website {
 
-        /* =========================
-           BUTTONS
-        ========================= */
+    opacity: 0;
 
-        .buttons {
+    transform: translateY(15px);
 
-            display: flex;
+    transition:
+        opacity .7s ease,
+        transform .7s ease;
 
-            gap: 13px;
+}
 
-            margin-top: 35px;
 
-            flex-wrap: wrap;
+#website.visible {
 
-        }
+    opacity: 1;
 
+    transform: translateY(0);
 
-        .button {
+}
 
-            text-decoration: none;
 
-            padding:
-                15px 21px;
+/* =====================================================
+   NAVBAR
+===================================================== */
 
-            border-radius: 30px;
+nav {
 
-            font-size: 14px;
+    height: 88px;
 
-            transition:
-                transform .25s ease,
-                background .25s ease;
+    padding:
+        0 6vw;
 
-        }
+    display:
 
+        flex;
 
-        .button:hover {
+    align-items:
+        center;
 
-            transform:
-                translateY(-3px);
+    justify-content:
+        space-between;
 
-        }
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.08);
 
+}
 
-        .primary {
 
-            background: #f5f4ef;
+.logo {
 
-            color: #08080a;
+    color: white;
 
-        }
+    text-decoration: none;
 
+    font-size: 25px;
 
-        .secondary {
+    font-weight: 700;
 
-            color: white;
+}
 
-            border:
-                1px solid #303035;
 
-        }
+.logo span {
 
+    color: #9b7cff;
 
-        /* =========================
-           PHOTO SIDE
-        ========================= */
+}
 
-        .photo-area {
 
-            position: relative;
+.nav-links {
 
-            height: 600px;
+    display: flex;
 
-            display: flex;
+    gap: 35px;
 
-            align-items: center;
+}
 
-            justify-content: center;
 
-            animation:
-                photoIn 1.2s ease .15s
-                both;
+.nav-links a {
 
-        }
+    color: #999;
 
+    text-decoration: none;
 
-        /* Main photo frame */
+    font-size: 14px;
 
-        .photo-frame {
+    transition:
+        color .2s ease;
 
-            width: min(390px, 75%);
+}
 
-            height: 500px;
 
-            position: relative;
+.nav-links a:hover {
 
-            overflow: hidden;
+    color: white;
 
-            border-radius:
-                190px 190px 25px 25px;
+}
 
-            background:
-                linear-gradient(
-                    145deg,
-                    #1c172b,
-                    #09090b
-                );
 
-            border:
-                1px solid rgba(255,255,255,.12);
+.resume {
 
-            box-shadow:
-                0 30px 100px
-                rgba(0,0,0,.55);
+    color: white;
 
-            z-index: 2;
+    text-decoration: none;
 
-        }
+    border:
+        1px solid #303035;
 
+    padding:
+        10px 17px;
 
-        .photo-frame img {
+    border-radius:
+        30px;
 
-            width: 100%;
-            height: 100%;
+    font-size: 13px;
 
-            object-fit: cover;
+}
 
-            object-position: center;
 
-            display: block;
+/* =====================================================
+   HERO
+===================================================== */
 
-            filter:
-                saturate(.9)
-                contrast(1.05);
+.hero {
 
-            transition:
-                transform .8s ease;
+    min-height:
+        calc(100vh - 88px);
 
-        }
+    padding:
+        6vw;
 
+    display:
+        grid;
 
-        .photo-frame:hover img {
+    grid-template-columns:
+        1.05fr .95fr;
 
-            transform:
-                scale(1.04);
+    align-items:
+        center;
 
-        }
+    gap:
+        50px;
 
+}
 
-        /* purple glow behind photo */
 
-        .photo-glow {
+/* =====================================================
+   HERO TEXT
+===================================================== */
 
-            position: absolute;
+.hero-text {
 
-            width: 330px;
-            height: 330px;
+    position:
+        relative;
 
-            border-radius: 50%;
+    z-index:
+        2;
 
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(155,124,255,.5),
-                    transparent 68%
-                );
+}
 
-            filter: blur(35px);
 
-            animation:
-                glowPulse 5s ease-in-out infinite;
+.kicker {
 
-        }
+    color:
+        #62d8ff;
 
+    font-family:
+        monospace;
 
-        /* =========================
-           FLOATING LABELS
-        ========================= */
+    font-size:
+        11px;
 
-        .floating-label {
+    letter-spacing:
+        3px;
 
-            position: absolute;
+    margin-bottom:
+        25px;
 
-            z-index: 4;
+}
 
-            padding:
-                10px 13px;
 
-            background:
-                rgba(12,12,15,.85);
+.hero h1 {
 
-            border:
-                1px solid rgba(255,255,255,.12);
+    font-size:
+        clamp(55px, 7.5vw, 115px);
 
-            backdrop-filter:
-                blur(10px);
+    line-height:
+        .88;
 
-            font-family:
-                monospace;
+    letter-spacing:
+        -6px;
 
-            font-size: 10px;
+    font-weight:
+        700;
 
-            letter-spacing: 1px;
+}
 
-            color: #aaa;
 
-            animation:
-                floatLabel 4s ease-in-out infinite;
+.hero h1 .outline {
 
-        }
+    color:
+        transparent;
 
+    -webkit-text-stroke:
+        1px rgba(255,255,255,.65);
 
-        .label-one {
+}
 
-            top: 16%;
 
-            left: 2%;
+.description {
 
-        }
+    max-width:
+        540px;
 
+    margin-top:
+        35px;
 
-        .label-two {
+    color:
+        #999;
 
-            bottom: 18%;
+    font-size:
+        17px;
 
-            right: 0%;
+    line-height:
+        1.7;
 
-            animation-delay:
-                -2s;
+}
 
-        }
 
+.buttons {
 
-        .label-three {
+    display:
+        flex;
 
-            top: 5%;
+    gap:
+        12px;
 
-            right: 5%;
+    margin-top:
+        35px;
 
-            color: #62d8ff;
+    flex-wrap:
+        wrap;
 
-        }
+}
 
 
-        /* =========================
-           DECORATIVE RINGS
-        ========================= */
+.button {
 
-        .orbit {
+    text-decoration:
+        none;
 
-            position: absolute;
+    padding:
+        15px 21px;
 
-            width: 500px;
+    border-radius:
+        30px;
 
-            height: 180px;
+    font-size:
+        14px;
 
-            border:
-                1px solid
-                rgba(155,124,255,.22);
+}
 
-            border-radius: 50%;
 
-            transform:
-                rotate(-25deg);
+.primary {
 
-            animation:
-                orbitRotate
-                18s
-                linear
-                infinite;
+    background:
+        #f5f4ef;
 
-        }
+    color:
+        #08080a;
 
+}
 
-        .orbit.two {
 
-            width: 430px;
+.secondary {
 
-            height: 130px;
+    color:
+        white;
 
-            border-color:
-                rgba(98,216,255,.15);
+    border:
+        1px solid #303035;
 
-            transform:
-                rotate(35deg);
+}
 
-            animation:
-                orbitRotateTwo
-                22s
-                linear
-                infinite;
 
-        }
+/* =====================================================
+   PHOTO
+===================================================== */
 
+.photo-area {
 
-        /* =========================
-           SCROLL INDICATOR
-        ========================= */
+    height:
+        600px;
 
-        .scroll {
+    position:
+        relative;
 
-            position: absolute;
+    display:
+        flex;
 
-            bottom: 35px;
+    align-items:
+        center;
 
-            left: 6vw;
+    justify-content:
+        center;
 
-            color: #555;
+}
 
-            font-family: monospace;
 
-            font-size: 10px;
+/* Glow */
 
-            letter-spacing: 2px;
+.photo-glow {
 
-            display: flex;
+    position:
+        absolute;
 
-            align-items: center;
+    width:
+        380px;
 
-            gap: 10px;
+    height:
+        380px;
 
-        }
+    border-radius:
+        50%;
 
+    background:
+        radial-gradient(
+            circle,
+            rgba(155,124,255,.4),
+            transparent 70%
+        );
 
-        .scroll-line {
+    filter:
+        blur(45px);
 
-            width: 45px;
+    animation:
+        glow 5s ease-in-out infinite;
 
-            height: 1px;
+}
 
-            background: #444;
 
-        }
+/* Photo */
 
+.photo-frame {
 
-        /* =========================
-           PROJECT SECTION
-        ========================= */
+    position:
+        relative;
 
-        .projects {
+    z-index:
+        3;
 
-            min-height: 100vh;
+    width:
+        min(370px, 72%);
 
-            padding:
-                120px 6vw;
+    height:
+        500px;
 
-            border-top:
-                1px solid
-                rgba(255,255,255,.08);
+    overflow:
+        hidden;
 
-        }
+    border-radius:
+        190px
+        190px
+        25px
+        25px;
 
+    border:
+        1px solid
+        rgba(255,255,255,.12);
 
-        .section-label {
+    background:
+        #15151a;
 
-            color: #62d8ff;
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.6);
 
-            font-family: monospace;
+}
 
-            font-size: 11px;
 
-            letter-spacing: 3px;
+.photo-frame img {
 
-            margin-bottom: 25px;
+    width:
+        100%;
 
-        }
+    height:
+        100%;
 
+    object-fit:
+        cover;
 
-        .projects h2 {
+    display:
+        block;
 
-            font-size:
-                clamp(
-                    55px,
-                    8vw,
-                    110px
-                );
+    transition:
+        transform .7s ease;
 
-            line-height: .9;
+}
 
-            letter-spacing: -5px;
 
-        }
+.photo-frame:hover img {
 
+    transform:
+        scale(1.04);
 
-        .projects h2 span {
+}
 
-            color: #666;
 
-        }
+/* =====================================================
+   ORBITS
+===================================================== */
 
+.orbit {
 
-        /* =========================
-           ANIMATIONS
-        ========================= */
+    position:
+        absolute;
 
-        @keyframes heroIn {
+    width:
+        500px;
 
-            from {
+    height:
+        180px;
 
-                opacity: 0;
+    border:
+        1px solid
+        rgba(155,124,255,.25);
 
-                transform:
-                    translateY(30px);
+    border-radius:
+        50%;
 
-            }
+    transform:
+        rotate(-25deg);
 
-            to {
+    animation:
+        orbit 18s linear infinite;
 
-                opacity: 1;
+}
 
-                transform:
-                    translateY(0);
 
-            }
+.orbit.two {
 
-        }
+    width:
+        430px;
 
+    height:
+        140px;
 
-        @keyframes photoIn {
+    border-color:
+        rgba(98,216,255,.15);
 
-            from {
+    transform:
+        rotate(30deg);
 
-                opacity: 0;
+    animation:
+        orbitTwo 20s linear infinite;
 
-                transform:
-                    translateY(40px)
-                    scale(.96);
+}
 
-            }
 
-            to {
+/* =====================================================
+   FLOATING LABELS
+===================================================== */
 
-                opacity: 1;
+.label {
 
-                transform:
-                    translateY(0)
-                    scale(1);
+    position:
+        absolute;
 
-            }
+    z-index:
+        5;
 
-        }
+    padding:
+        9px 12px;
 
+    border:
+        1px solid
+        rgba(255,255,255,.12);
 
-        @keyframes glowPulse {
+    background:
+        rgba(10,10,13,.8);
 
-            0%,100% {
+    backdrop-filter:
+        blur(10px);
 
-                transform:
-                    scale(.95);
+    color:
+        #aaa;
 
-                opacity: .55;
+    font-family:
+        monospace;
 
-            }
+    font-size:
+        10px;
 
-            50% {
+    letter-spacing:
+        1px;
 
-                transform:
-                    scale(1.08);
+}
 
-                opacity: .85;
 
-            }
+.label.one {
 
-        }
+    top:
+        18%;
 
+    left:
+        2%;
 
-        @keyframes floatLabel {
+}
 
-            0%,100% {
 
-                transform:
-                    translateY(0);
+.label.two {
 
-            }
+    bottom:
+        18%;
 
-            50% {
+    right:
+        0;
 
-                transform:
-                    translateY(-8px);
+}
 
-            }
 
-        }
+.label.three {
 
+    top:
+        8%;
 
-        @keyframes orbitRotate {
+    right:
+        5%;
 
-            to {
+    color:
+        #62d8ff;
 
-                transform:
-                    rotate(335deg);
+}
 
-            }
 
-        }
+/* =====================================================
+   PROJECTS
+===================================================== */
 
+.section {
 
-        @keyframes orbitRotateTwo {
+    min-height:
+        80vh;
 
-            to {
+    padding:
+        120px 6vw;
 
-                transform:
-                    rotate(-325deg);
+    border-top:
+        1px solid
+        rgba(255,255,255,.08);
 
-            }
+}
 
-        }
 
+.section-label {
 
-        /* =========================
-           MOBILE
-        ========================= */
+    color:
+        #62d8ff;
 
-        @media(max-width:850px) {
+    font-family:
+        monospace;
 
-            nav {
+    font-size:
+        11px;
 
-                padding:
-                    0 5vw;
+    letter-spacing:
+        3px;
 
-            }
+}
 
 
-            .nav-links {
+.section h2 {
 
-                display: none;
+    font-size:
+        clamp(55px, 8vw, 110px);
 
-            }
+    line-height:
+        .9;
 
+    letter-spacing:
+        -5px;
 
-            .hero {
+    margin-top:
+        25px;
 
-                grid-template-columns:
-                    1fr;
+}
 
-                padding:
-                    70px 5vw;
 
-                gap: 60px;
+.section h2 span {
 
-            }
+    color:
+        #666;
 
+}
 
-            .hero h1 {
 
-                letter-spacing:
-                    -4px;
+/* =====================================================
+   ANIMATIONS
+===================================================== */
 
-            }
+@keyframes glow {
 
+    0%,100% {
+        transform: scale(.95);
+        opacity: .6;
+    }
 
-            .photo-area {
+    50% {
+        transform: scale(1.08);
+        opacity: .9;
+    }
 
-                height: 520px;
+}
 
-            }
 
+@keyframes orbit {
 
-            .photo-frame {
+    to {
+        transform:
+            rotate(335deg);
+    }
 
-                width: 300px;
+}
 
-                height: 420px;
 
-            }
+@keyframes orbitTwo {
 
+    to {
+        transform:
+            rotate(-330deg);
+    }
 
-            .orbit {
+}
 
-                width: 360px;
 
-            }
+/* =====================================================
+   MOBILE
+===================================================== */
 
+@media(max-width:850px) {
 
-            .scroll {
+    .nav-links {
+        display: none;
+    }
 
-                display: none;
 
-            }
+    .hero {
 
-        }
+        grid-template-columns:
+            1fr;
 
-    </style>
+        padding:
+            70px 6vw;
 
+    }
+
+
+    .photo-area {
+
+        height:
+            520px;
+
+    }
+
+
+    .photo-frame {
+
+        width:
+            300px;
+
+        height:
+            420px;
+
+    }
+
+
+    .orbit {
+
+        width:
+            360px;
+
+    }
+
+
+    .name-container {
+
+        font-size:
+            12vw;
+
+    }
+
+}
+
+</style>
 </head>
 
 
 <body>
 
 
-<!-- =========================
-     NAVIGATION
-========================= -->
+<!-- =====================================================
+     OPENING
+===================================================== -->
+
+<div id="intro">
+
+    <div class="name-container">
+
+        <!-- TOP HALF -->
+
+        <div class="name-half name-top">
+
+            <span>
+                KAVYA SINGHAL
+            </span>
+
+        </div>
+
+
+        <!-- BOTTOM HALF -->
+
+        <div class="name-half name-bottom">
+
+            <span>
+                KAVYA SINGHAL
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     WEBSITE
+===================================================== -->
+
+<div id="website">
+
+
+<!-- NAV -->
 
 <nav>
 
@@ -854,7 +987,7 @@
     </div>
 
 
-    <a href="#" class="resume-button">
+    <a href="#" class="resume">
 
         Resume ↗
 
@@ -864,19 +997,16 @@
 
 
 
-<!-- =========================
-     HERO
-========================= -->
+<!-- HERO -->
 
 <section class="hero">
 
 
-    <!-- LEFT -->
+    <!-- TEXT -->
 
-    <div class="hero-content">
+    <div class="hero-text">
 
-
-        <div class="eyebrow">
+        <div class="kicker">
 
             XR DEVELOPER · UNITY DEVELOPER · GAME DEVELOPER
 
@@ -896,10 +1026,10 @@
         </h1>
 
 
-        <p class="hero-description">
+        <p class="description">
 
             I create immersive experiences,
-            interactive applications, and games
+            interactive applications and games
             using Unity, AR/VR and 3D technologies.
 
         </p>
@@ -907,14 +1037,11 @@
 
         <div class="buttons">
 
-
             <a
                 href="#work"
                 class="button primary"
             >
-
                 Explore My Work →
-
             </a>
 
 
@@ -922,20 +1049,16 @@
                 href="#contact"
                 class="button secondary"
             >
-
                 Let's Connect
-
             </a>
 
-
         </div>
-
 
     </div>
 
 
 
-    <!-- RIGHT / PHOTO -->
+    <!-- PHOTO -->
 
     <div class="photo-area">
 
@@ -948,21 +1071,21 @@
         <div class="orbit two"></div>
 
 
-        <div class="floating-label label-one">
+        <div class="label one">
 
             UNITY / C#
 
         </div>
 
 
-        <div class="floating-label label-two">
+        <div class="label two">
 
             AR · VR · XR
 
         </div>
 
 
-        <div class="floating-label label-three">
+        <div class="label three">
 
             3D / INTERACTIVE
 
@@ -971,26 +1094,14 @@
 
         <div class="photo-frame">
 
-
-            <!-- YOUR GITHUB PHOTO -->
-
             <img
                 src="profile.jpg"
                 alt="Kavya Singhal"
+                onerror="this.style.display='none'"
             >
-
 
         </div>
 
-
-    </div>
-
-
-    <div class="scroll">
-
-        <span class="scroll-line"></span>
-
-        SCROLL TO EXPLORE
 
     </div>
 
@@ -999,15 +1110,12 @@
 
 
 
-<!-- =========================
-     PROJECTS
-========================= -->
+<!-- PROJECTS -->
 
 <section
-    class="projects"
+    class="section"
     id="work"
 >
-
 
     <div class="section-label">
 
@@ -1024,20 +1132,16 @@
 
     </h2>
 
-
 </section>
 
 
 
-<!-- =========================
-     ABOUT
-========================= -->
+<!-- ABOUT -->
 
 <section
-    class="projects"
+    class="section"
     id="about"
 >
-
 
     <div class="section-label">
 
@@ -1054,20 +1158,16 @@
 
     </h2>
 
-
 </section>
 
 
 
-<!-- =========================
-     CONTACT
-========================= -->
+<!-- CONTACT -->
 
 <section
-    class="projects"
+    class="section"
     id="contact"
 >
-
 
     <div class="section-label">
 
@@ -1084,10 +1184,62 @@
 
     </h2>
 
-
 </section>
 
 
-</body>
+</div>
 
+
+
+<!-- =====================================================
+     OPENING JAVASCRIPT
+===================================================== -->
+
+<script>
+
+window.addEventListener("load", function () {
+
+    const intro =
+        document.getElementById("intro");
+
+    const website =
+        document.getElementById("website");
+
+
+    /*
+        0.00s
+        KAVYA SINGHAL appears
+
+        0.95s
+        horizontal split starts
+
+        1.45s
+        website appears
+
+        1.90s
+        intro completely disappears
+    */
+
+
+    setTimeout(function () {
+
+        intro.classList.add("split");
+
+        website.classList.add("visible");
+
+    }, 950);
+
+
+    setTimeout(function () {
+
+        intro.classList.add("hide");
+
+    }, 1900);
+
+});
+
+</script>
+
+
+</body>
 </html>
