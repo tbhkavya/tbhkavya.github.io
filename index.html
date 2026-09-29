@@ -1,0 +1,2408 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kavya Singhal — XR / Unity Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            hand: ['Caveat', 'cursive'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            paper: '#f7f3eb',
+            ink: '#1a1a1a',
+            subtle: '#4a4a4a',
+            muted: '#8a8580',
+            border: '#d9d3c7',
+            accent: {
+              blue: '#4a90d9',
+              yellow: '#f5d04e',
+              pink: '#e87e9c',
+              mint: '#5cc9a8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --paper: #f7f3eb;
+      --ink: #1a1a1a;
+      --subtle: #4a4a4a;
+      --muted: #8a8580;
+      --border: #d9d3c7;
+      --blue: #4a90d9;
+      --yellow: #f5d04e;
+      --pink: #e87e9c;
+      --mint: #5cc9a8;
+      --tape: rgba(245, 240, 220, 0.75);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Paper texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* Handwritten styles */
+    .handwritten {
+      font-family: 'Caveat', cursive;
+      line-height: 1.2;
+    }
+
+    /* Sticker styles */
+    .sticker {
+      display: inline-block;
+      padding: 6px 16px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 3px 0px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: default;
+      white-space: nowrap;
+    }
+    .sticker:hover {
+      transform: rotate(0deg) scale(1.05) !important;
+      box-shadow: 3px 5px 0px rgba(0,0,0,0.12);
+    }
+    .sticker-blue { background: var(--blue); color: #fff; border-color: var(--ink); }
+    .sticker-yellow { background: var(--yellow); color: var(--ink); border-color: var(--ink); }
+    .sticker-pink { background: var(--pink); color: #fff; border-color: var(--ink); }
+    .sticker-mint { background: var(--mint); color: var(--ink); border-color: var(--ink); }
+    .sticker-white { background: #fff; color: var(--ink); border-color: var(--ink); }
+    .sticker-ink { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    /* Polaroid */
+    .polaroid {
+      background: #fff;
+      padding: 12px 12px 40px 12px;
+      box-shadow: 4px 6px 20px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06);
+      position: relative;
+      display: inline-block;
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+    }
+    .polaroid:hover {
+      transform: rotate(0deg) scale(1.03) !important;
+      box-shadow: 8px 14px 30px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08);
+      z-index: 10;
+    }
+    .polaroid img {
+      display: block;
+      width: 100%;
+      height: auto;
+      filter: contrast(1.02) saturate(0.9);
+    }
+    .polaroid .tape {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-3deg);
+      width: 60px;
+      height: 22px;
+      background: var(--tape);
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      z-index: 2;
+    }
+    .polaroid .tape::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.03) 3px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    /* Hand-drawn arrow */
+    .arrow-hand {
+      display: inline-flex;
+      align-items: center;
+      font-family: 'Caveat', cursive;
+      font-size: 1.5rem;
+      color: var(--ink);
+      opacity: 0.7;
+      transition: opacity 0.4s ease;
+    }
+    .arrow-hand svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--ink);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Project card */
+    .project-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      cursor: pointer;
+    }
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.05);
+      z-index: 5;
+    }
+    .project-card img {
+      transition: transform 0.6s ease;
+    }
+    .project-card:hover img {
+      transform: scale(1.04);
+    }
+
+    /* Notebook grid background */
+    .notebook-bg {
+      background-image:
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* Torn paper effect */
+    .torn-paper {
+      position: relative;
+      background: #fff;
+      padding: 2rem;
+    }
+    .torn-paper::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      height: 16px;
+      background: linear-gradient(135deg, var(--paper) 25%, transparent 25%) -8px 0,
+                  linear-gradient(225deg, var(--paper) 25%, transparent 25%) -8px 0,
+                  linear-gradient(315deg, var(--paper) 25%, transparent 25%),
+                  linear-gradient(45deg, var(--paper) 25%, transparent 25%);
+      background-size: 16px 16px;
+      background-repeat: repeat-x;
+    }
+
+    /* Coffee stain */
+    .coffee-stain {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(160,120,80,0.08) 30%, rgba(160,120,80,0.03) 60%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Stamp effect */
+    .stamp {
+      display: inline-block;
+      padding: 8px 18px;
+      border: 3px solid var(--ink);
+      border-radius: 8px;
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ink);
+      transform: rotate(-8deg);
+      opacity: 0.7;
+      position: relative;
+    }
+    .stamp::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border: 1px dashed rgba(0,0,0,0.2);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-content {
+      background: var(--paper);
+      max-width: 800px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 3rem 2.5rem;
+      position: relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      transform: translateY(20px);
+      transition: transform 0.4s ease;
+    }
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 2rem;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.3s ease;
+      z-index: 10;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--ink); }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--paper); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #b5afa3; }
+
+    /* Mobile nav */
+    .mobile-nav {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .mobile-nav.open {
+      max-height: 400px;
+    }
+
+    /* Section divider - hand-drawn line */
+    .hand-line {
+      height: 2px;
+      background: var(--ink);
+      opacity: 0.2;
+      position: relative;
+      border: none;
+    }
+    .hand-line::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: -1px;
+      width: 40px;
+      height: 4px;
+      background: var(--ink);
+      opacity: 0.5;
+      border-radius: 2px;
+    }
+
+    /* Link underline animation */
+    .link-underline {
+      position: relative;
+      text-decoration: none;
+      color: var(--ink);
+      transition: color 0.3s ease;
+    }
+    .link-underline::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--ink);
+      transition: width 0.3s ease;
+    }
+    .link-underline:hover::after {
+      width: 100%;
+    }
+
+    /* Button styles */
+    .btn-label {
+      display: inline-block;
+      padding: 14px 28px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      border: 2px solid var(--ink);
+      transition: all 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    .btn-label:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 6px 0px rgba(0,0,0,0.1);
+    }
+    .btn-filled {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .btn-filled:hover {
+      background: #333;
+      border-color: #333;
+      color: #fff;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+    }
+    .btn-outline:hover {
+      background: var(--ink);
+      color: #fff;
+    }
+    .btn-yellow {
+      background: var(--yellow);
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+    .btn-yellow:hover {
+      background: #e8c040;
+    }
+
+    /* Tag */
+    .tech-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--subtle);
+      background: rgba(255,255,255,0.5);
+      margin: 2px 4px;
+    }
+
+    /* Timeline */
+    .timeline-item {
+      position: relative;
+      padding-left: 2.5rem;
+      padding-bottom: 2rem;
+      border-left: 2px solid var(--border);
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--ink);
+      border: 3px solid var(--paper);
+      box-shadow: 0 0 0 2px var(--border);
+    }
+    .timeline-item:last-child {
+      border-left-color: transparent;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .polaroid { transform: rotate(1deg) !important; }
+      .sticker { font-size: 0.78rem; padding: 4px 12px; }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Navigation -->
+<nav id="navbar"
+     class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+     style="background: transparent;">
+
+  <div class="max-w-7xl mx-auto px-6 md:px-10 py-4 flex items-center justify-between">
+
+    <!-- Logo -->
+    <a href="#hero"
+       class="font-serif font-bold text-lg md:text-xl tracking-tight text-ink hover:opacity-70 transition-opacity">
+      KAVYA <span class="text-accent-blue">/</span> XR
+    </a>
+
+
+    <!-- Desktop Navigation -->
+    <div class="hidden lg:flex items-center gap-8 text-sm font-medium tracking-wide">
+
+      <a href="#hero" class="link-underline">
+        HOME
+      </a>
+
+      <a href="#about" class="link-underline">
+        ABOUT
+      </a>
+
+      <a href="#work" class="link-underline">
+        WORK
+      </a>
+
+      <a href="#experiments" class="link-underline">
+        LAB
+      </a>
+
+      <a href="#blender" class="link-underline">
+        SCRAPS
+      </a>
+
+      <span class="text-border">|</span>
+
+      <a href="#experience" class="link-underline">
+        EXPERIENCE
+      </a>
+
+      <a href="#contact" class="link-underline">
+        CONTACT
+      </a>
+
+    </div>
+
+
+    <!-- Mobile Menu Button -->
+    <button id="menu-toggle"
+            class="lg:hidden text-ink text-2xl font-light p-2"
+            aria-label="Menu">
+
+      <span id="menu-icon">☰</span>
+
+    </button>
+
+  </div>
+
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu"
+       class="mobile-nav lg:hidden bg-paper/95 backdrop-blur-sm border-t border-border">
+
+    <div class="px-6 py-4 flex flex-col gap-3 text-sm font-medium">
+
+      <a href="#hero"
+         class="py-2 link-underline mobile-link">
+        HOME
+      </a>
+
+      <a href="#about"
+         class="py-2 link-underline mobile-link">
+        ABOUT
+      </a>
+
+      <a href="#work"
+         class="py-2 link-underline mobile-link">
+        WORK
+      </a>
+
+      <a href="#experiments"
+         class="py-2 link-underline mobile-link">
+        THE LAB
+      </a>
+
+      <a href="#blender"
+         class="py-2 link-underline mobile-link">
+        CREATIVE SCRAPS
+      </a>
+
+      <a href="#experience"
+         class="py-2 link-underline mobile-link">
+        EXPERIENCE
+      </a>
+
+      <a href="#contact"
+         class="py-2 link-underline mobile-link">
+        CONTACT
+      </a>
+
+    </div>
+
+  </div>
+
+</nav>
+
+  <!-- HERO -->
+  <section id="hero" class="min-h-screen flex items-center pt-20 pb-16 px-6 md:px-10 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <!-- Left column -->
+      <div class="lg:col-span-7 relative z-10">
+        <p class="handwritten text-2xl md:text-3xl text-subtle mb-2 reveal" style="transform: rotate(-1deg);">
+          hi, I'm Kavya.
+        </p>
+        <h1 class="font-serif font-black text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-[0.9] tracking-tight mb-4 reveal">
+          KAVYA<br>SINGHAL
+        </h1>
+        <!-- Floating labels -->
+        <div class="flex flex-wrap gap-3 mt-6 mb-8 reveal">
+          <span class="sticker sticker-blue" style="transform: rotate(-2deg);">XR DEVELOPER</span>
+          <span class="sticker sticker-yellow" style="transform: rotate(1.5deg);">UNITY</span>
+          <span class="sticker sticker-pink" style="transform: rotate(-0.8deg);">AR / VR</span>
+          <span class="sticker sticker-mint" style="transform: rotate(2deg);">GAME DEV</span>
+          <span class="sticker sticker-ink" style="transform: rotate(-1.2deg);">3D</span>
+        </div>
+        <p class="text-base md:text-lg text-subtle max-w-lg leading-relaxed reveal">
+          I build interactive experiences where <strong>code meets the real world</strong>. Crafting immersive XR worlds, one pixel at a time.
+        </p>
+        <!-- Handwritten arrow pointing to photo -->
+        <div class="hidden lg:flex items-center gap-2 mt-6 reveal">
+          <span class="arrow-hand" style="transform: rotate(-15deg);">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </span>
+          <span class="handwritten text-lg text-subtle">that's me ↓</span>
+        </div>
+      </div>
+
+      <!-- Right column - Polaroid -->
+      <div class="lg:col-span-5 flex justify-center lg:justify-end relative reveal">
+        <div class="polaroid" style="transform: rotate(3deg);">
+          <div class="tape"></div>
+          <img src="profile.jpeg" alt="Kavya Singhal" width="400" height="500" loading="eager">
+          <p class="handwritten text-center mt-3 text-lg text-subtle" style="transform: rotate(-1deg);">tinkering in the lab 🧪</p>
+        </div>
+        <!-- Decorative arrow -->
+        <div class="absolute -bottom-4 -left-4 lg:-left-8 arrow-hand hidden md:block" style="transform: rotate(25deg);">
+          <svg viewBox="0 0 24 24"><path d="M7 17l10-10M17 7v10H7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decorative corner elements -->
+    <div class="absolute top-24 right-8 md:right-16 opacity-20 pointer-events-none hidden lg:block">
+      <span class="handwritten text-5xl text-accent-pink" style="transform: rotate(12deg);">✦</span>
+    </div>
+    <div class="absolute bottom-12 left-8 md:left-16 opacity-15 pointer-events-none hidden lg:block">
+      <span class="handwritten text-4xl text-accent-blue" style="transform: rotate(-8deg);">✎</span>
+    </div>
+  </section>
+
+  <!-- Hand-drawn divider -->
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <hr class="hand-line">
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about" class="py-20 md:py-32 px-6 md:px-10">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+      <div class="lg:col-span-4 reveal">
+        <h2 class="font-serif font-black text-4xl md:text-5xl lg:text-6xl leading-[0.9] mb-6">
+          WHAT DO I<br>ACTUALLY DO?
+        </h2>
+        <div class="polaroid inline-block" style="transform: rotate(-2deg);">
+          <div class="tape" style="left: 30%;"></div>
+          <img src="ren4.png" alt="Kavya working" width="300" height="350" loading="lazy">
+        </div>
+      </div>
+      <div class="lg:col-span-8 relative">
+        <div class="prose prose-lg max-w-none reveal">
+          <p class="text-lg md:text-xl leading-relaxed text-subtle mb-6">
+  I'm a <strong>final-year Computer Science student</strong> passionate about building immersive 
+  <strong>AR, VR, and interactive experiences</strong>. Most of my time is spent working with 
+  Unity, Blender, and C# — turning ideas into experiences people can actually interact with.
+</p>
+
+<p class="text-lg md:text-xl leading-relaxed text-subtle mb-6">
+  I enjoy building things at the intersection of <strong>technology, creativity, and real-world interaction</strong> 
+  — from markerless AR and geospatial experiences to VR simulations and interactive applications. 
+  I'm always experimenting with new ways to make digital experiences feel more natural and engaging.
+</p>
+
+<p class="text-lg md:text-xl leading-relaxed text-subtle mb-8">
+  Beyond development, I care about <strong>how an experience feels</strong>. I love designing interactions, 
+  exploring 3D environments, and refining the details that make a project intuitive rather than just functional.
+</p>
+</div>
+        <!-- Handwritten annotations -->
+        <div class="flex flex-wrap gap-6 mt-4 reveal">
+          <span class="handwritten text-xl text-accent-blue" style="transform: rotate(-3deg);">📍 Based in India</span>
+          <span class="handwritten text-xl text-accent-pink" style="transform: rotate(2deg);">🎓 Final Year CSE</span>
+          <span class="handwritten text-xl text-accent-mint" style="transform: rotate(-1deg);">🥽 XR Developer</span>
+          <span class="handwritten text-xl text-accent-yellow" style="transform: rotate(-1deg);">✨ Always Experimenting</span>
+        </div>
+        <!-- Arrow -->
+        <div class="mt-8 arrow-hand reveal" style="transform: rotate(10deg);">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          <span class="ml-2 text-subtle">explore what I’ve been building ↓</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hand-drawn divider -->
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <hr class="hand-line">
+  </div>
+
+  <!-- SKILLS -->
+  <section id="skills" class="py-20 md:py-32 px-6 md:px-10">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="font-serif font-black text-4xl md:text-5xl lg:text-6xl leading-[0.9] mb-4 reveal">
+        THINGS I WORK WITH
+      </h2>
+      <p class="handwritten text-2xl text-subtle mb-12 reveal" style="transform: rotate(-1deg);">my creative toolbox 🧰</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
+        <!-- BUILD -->
+<div class="reveal">
+  <p class="handwritten text-xl font-bold text-accent-yellow mb-3"
+     style="transform: rotate(-2deg);">LANGUAGES</p>
+  <div class="flex flex-wrap gap-2">
+    <span class="sticker sticker-white" style="transform: rotate(-1deg);">C#</span>
+    <span class="sticker sticker-white" style="transform: rotate(1deg);">C++</span>
+    <span class="sticker sticker-white" style="transform: rotate(-0.5deg);">C</span>
+    <span class="sticker sticker-white" style="transform: rotate(2deg);">Java</span>
+    <span class="sticker sticker-white" style="transform: rotate(-1.5deg);">Python</span>
+    <span class="sticker sticker-white" style="transform: rotate(1deg);">SQL</span>
+  </div>
+</div>
+
+<!-- XR -->
+<div class="reveal">
+  <p class="handwritten text-xl font-bold text-accent-blue mb-3"
+     style="transform: rotate(1deg);">XR & DEVELOPMENT</p>
+  <div class="flex flex-wrap gap-2">
+    <span class="sticker sticker-blue" style="transform: rotate(0.5deg);">Unity</span>
+    <span class="sticker sticker-blue" style="transform: rotate(-1deg);">AR</span>
+    <span class="sticker sticker-blue" style="transform: rotate(2deg);">VR</span>
+    <span class="sticker sticker-blue" style="transform: rotate(-0.5deg);">Vuforia</span>
+    <span class="sticker sticker-blue" style="transform: rotate(1deg);">ARCore</span>
+    <span class="sticker sticker-blue" style="transform: rotate(-1deg);">XR Interaction Toolkit</span>
+  </div>
+</div>
+
+<!-- 3D -->
+<div class="reveal">
+  <p class="handwritten text-xl font-bold text-accent-pink mb-3"
+     style="transform: rotate(-1.5deg);">3D & CREATIVE</p>
+  <div class="flex flex-wrap gap-2">
+    <span class="sticker sticker-pink" style="transform: rotate(1deg);">Blender</span>
+    <span class="sticker sticker-pink" style="transform: rotate(0.5deg);">3D Modeling</span>
+    <span class="sticker sticker-pink" style="transform: rotate(-1deg);">Lens Studio</span>
+    <span class="sticker sticker-pink" style="transform: rotate(1.5deg);">Aseprite</span>
+  </div>
+</div>
+
+<!-- DESIGN -->
+<div class="reveal">
+  <p class="handwritten text-xl font-bold text-accent-mint mb-3"
+     style="transform: rotate(2deg);">DESIGN & UI</p>
+  <div class="flex flex-wrap gap-2">
+    <span class="sticker sticker-mint" style="transform: rotate(-0.5deg);">Figma</span>
+    <span class="sticker sticker-mint" style="transform: rotate(1.5deg);">UI/UX</span>
+    <span class="sticker sticker-mint" style="transform: rotate(-1deg);">Unity UI Toolkit</span>
+    <span class="sticker sticker-mint" style="transform: rotate(0.5deg);">UXML / USS</span>
+  </div>
+</div>
+
+<!-- TOOLS -->
+<div class="reveal">
+  <p class="handwritten text-xl font-bold text-accent-ink mb-3"
+     style="transform: rotate(-2deg);">TOOLS & TECHNOLOGIES</p>
+  <div class="flex flex-wrap gap-2">
+    <span class="sticker sticker-ink" style="transform: rotate(1deg);">Git</span>
+    <span class="sticker sticker-ink" style="transform: rotate(-1deg);">GitHub</span>
+    <span class="sticker sticker-ink" style="transform: rotate(0.5deg);">Firebase</span>
+    <span class="sticker sticker-ink" style="transform: rotate(2deg);">Cesium ion</span>
+    <span class="sticker sticker-ink" style="transform: rotate(-1deg);">Immersal</span>
+    <span class="sticker sticker-ink" style="transform: rotate(1.5deg);">QGIS</span>
+    <span class="sticker sticker-ink" style="transform: rotate(-0.5deg);">Firestore</span>
+  </div>
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hand-drawn divider -->
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <hr class="hand-line">
+  </div>
+
+ <!-- WORK -->
+<section id="work" class="py-20 md:py-32 px-6 md:px-10">
+  <div class="max-w-7xl mx-auto">
+
+    <h2 class="font-serif font-black text-4xl md:text-5xl lg:text-6xl leading-[0.9] mb-2 reveal">
+      SELECTED WORK
+    </h2>
+
+    <p class="handwritten text-2xl text-subtle mb-12 reveal"
+       style="transform: rotate(-1deg);">
+      things I've built ↓
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8">
+<!-- PROJECT 01 — YES CHEF -->
+<div class="lg:col-span-7 project-card reveal bg-white border border-border p-3 md:p-4"
+     data-project="0"
+     style="transform: rotate(-0.5deg);">
+
+  <div class="overflow-hidden mb-4">
+    <img src="project\p1.png"
+         alt="Yes Chef"
+         class="w-full h-64 md:h-80 object-cover"
+         loading="lazy">
+  </div>
+
+  <span class="handwritten text-sm text-muted block mb-1">
+    PROJECT 01
+  </span>
+
+  <h3 class="font-serif font-bold text-2xl md:text-3xl mb-2">
+    Yes Chef
+  </h3>
+
+  <p class="text-subtle text-sm md:text-base mb-3">
+    A fast-paced first-person cooking game built in Unity.
+    Players prepare orders, pick up ingredients, chop food,
+    interact with kitchen objects, and serve customers under
+    time pressure.
+  </p>
+
+  <div class="flex flex-wrap gap-2 mb-3">
+    <span class="tech-tag">Unity</span>
+    <span class="tech-tag">C#</span>
+    <span class="tech-tag">Gameplay</span>
+    <span class="tech-tag">UI</span>
+  </div>
+
+  <span class="link-underline font-semibold text-sm cursor-pointer">
+    VIEW PROJECT →
+  </span>
+</div>
+
+
+<!-- PROJECT 02 — VR FLOOD SIMULATION -->
+<div class="lg:col-span-5 lg:mt-16 project-card reveal bg-white border border-border p-3 md:p-4"
+     data-project="1"
+     style="transform: rotate(1deg);">
+
+  <div class="overflow-hidden mb-4">
+    <img src="YOUR_FLOOD_SIMULATION_IMAGE"
+         alt="VR Flood Simulation"
+         class="w-full h-56 md:h-64 object-cover"
+         loading="lazy">
+  </div>
+
+  <span class="handwritten text-sm text-muted block mb-1">
+    PROJECT 02
+  </span>
+
+  <h3 class="font-serif font-bold text-2xl md:text-3xl mb-2">
+    VR Flood Simulation
+  </h3>
+
+  <p class="text-subtle text-sm md:text-base mb-3">
+    An immersive VR disaster-management simulation where users
+    experience a flooding scenario and interact with their
+    surroundings to understand emergency situations.
+  </p>
+
+  <div class="flex flex-wrap gap-2 mb-3">
+    <span class="tech-tag">Unity</span>
+    <span class="tech-tag">VR</span>
+    <span class="tech-tag">XR Toolkit</span>
+    <span class="tech-tag">C#</span>
+  </div>
+
+  <span class="link-underline font-semibold text-sm cursor-pointer">
+    VIEW PROJECT →
+  </span>
+</div>
+
+
+<!-- PROJECT 03 — DARE TILES AR -->
+<div class="lg:col-span-5 project-card reveal bg-white border border-border p-3 md:p-4"
+     data-project="2"
+     style="transform: rotate(-1deg);">
+
+  <div class="overflow-hidden mb-4">
+    <div class="w-full h-52 md:h-60 bg-black flex items-center justify-center relative">
+
+      <div class="text-center">
+        <div class="text-6xl mb-3">🎮</div>
+
+        <p class="handwritten text-2xl text-white">
+          Dare Tiles AR
+        </p>
+
+        <p class="text-sm text-gray-400 mt-2">
+          AR Game • Unity • Vuforia
+        </p>
+      </div>
+
+      <span class="absolute top-4 left-4 handwritten text-sm text-white opacity-60">
+        AR / GAME
+      </span>
+
+      <span class="absolute bottom-4 right-4 handwritten text-sm text-white opacity-60">
+        03
+      </span>
+
+    </div>
+  </div>
+
+  <span class="handwritten text-sm text-muted block mb-1">
+    PROJECT 03
+  </span>
+
+  <h3 class="font-serif font-bold text-2xl md:text-3xl mb-2">
+    Dare Tiles AR
+  </h3>
+
+  <p class="text-subtle text-sm md:text-base mb-3">
+    An interactive AR game built with Unity where players
+    interact with virtual tiles and complete challenges
+    through an augmented environment.
+  </p>
+
+  <div class="flex flex-wrap gap-2 mb-3">
+    <span class="tech-tag">Unity</span>
+    <span class="tech-tag">Vuforia</span>
+    <span class="tech-tag">AR</span>
+    <span class="tech-tag">C#</span>
+  </div>
+
+  <span class="link-underline font-semibold text-sm cursor-pointer">
+    VIEW PROJECT →
+  </span>
+</div>
+
+
+<!-- PROJECT 04 — AR/VR HOME DESIGNER -->
+<div class="lg:col-span-7 project-card reveal bg-white border border-border p-3 md:p-4"
+     data-project="3"
+     style="transform: rotate(0.5deg);">
+
+  <div class="overflow-hidden mb-4">
+    <img src="YOUR_HOME_DESIGNER_IMAGE"
+         alt="AR VR Home Designer"
+         class="w-full h-56 md:h-72 object-cover"
+         loading="lazy">
+  </div>
+
+  <span class="handwritten text-sm text-muted block mb-1">
+    PROJECT 04
+  </span>
+
+  <h3 class="font-serif font-bold text-2xl md:text-3xl mb-2">
+    AR/VR Home Designer
+  </h3>
+
+  <p class="text-subtle text-sm md:text-base mb-3">
+    An interactive spatial design experience that allows users
+    to visualize and arrange furniture and interior elements
+    within a virtual or augmented environment.
+  </p>
+
+  <div class="flex flex-wrap gap-2 mb-3">
+    <span class="tech-tag">Unity</span>
+    <span class="tech-tag">AR</span>
+    <span class="tech-tag">VR</span>
+    <span class="tech-tag">C#</span>
+    <span class="tech-tag">3D</span>
+  </div>
+
+  <span class="link-underline font-semibold text-sm cursor-pointer">
+    VIEW PROJECT →
+  </span>
+</div>
+
+    </div>
+  </div>
+</section>
+
+  <!-- Hand-drawn divider -->
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <hr class="hand-line">
+  </div>
+
+ <!-- EXPERIMENTS -->
+<section id="experiments" class="py-20 md:py-32 px-6 md:px-10 relative">
+  <div class="max-w-7xl mx-auto">
+
+    <h2 class="font-serif font-black text-4xl md:text-5xl lg:text-6xl leading-[0.9] mb-4 reveal">
+      THE LAB
+    </h2>
+
+    <p class="handwritten text-2xl text-subtle mb-12 reveal"
+       style="transform: rotate(-1deg);">
+      ideas I'm still messing with ✦
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+
+      <!-- Experiment 1 — Hand Controlled AR Car -->
+      <div class="reveal" style="transform: rotate(-3deg);">
+        <div class="bg-accent-yellow p-5 shadow-lg relative"
+             style="border: 1px solid rgba(0,0,0,0.1);
+                    box-shadow: 3px 5px 12px rgba(0,0,0,0.08);">
+
+          <div class="absolute top-0 left-0 w-full h-1
+                      bg-gradient-to-r from-transparent via-black/5 to-transparent">
+          </div>
+
+          <p class="handwritten text-xl font-bold text-ink mb-2">
+            Hand-Controlled AR Car 🚗
+          </p>
+
+          <p class="text-sm text-subtle">
+            Experimenting with MediaPipe hand tracking to control an
+            AR car using natural hand gestures. Tilt left, tilt right,
+            open hand to move forward, and a fist to stop.
+          </p>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="tech-tag">Unity</span>
+            <span class="tech-tag">AR</span>
+            <span class="tech-tag">MediaPipe</span>
+          </div>
+
+          <span class="stamp mt-3 text-xs"
+                style="transform: rotate(-5deg);">
+            EXPERIMENT
+          </span>
+        </div>
+      </div>
+
+
+      <!-- Experiment 2 — Snapchat Easter Egg -->
+      <div class="reveal lg:mt-12" style="transform: rotate(2deg);">
+        <div class="torn-paper notebook-bg shadow-md relative">
+
+          <p class="handwritten text-xl font-bold text-ink mb-2">
+            Made a Lens 👻
+          </p>
+
+          <p class="text-sm text-subtle mb-4">
+            Sometimes I build things just because they're fun.
+            I experiment with Snapchat Lens Studio and interactive
+            camera experiences too.
+          </p>
+
+          <!-- Snapchat Easter Egg -->
+          <a href="https://creator.snapchat.com/creator/Z6ddMmhQQJBWkERNP-p3Qg"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 handwritten text-base
+                    text-accent-pink hover:underline cursor-pointer">
+
+            👻 find my little experiments →
+          </a>
+
+          <p class="handwritten text-sm text-muted mt-3">
+            psst... this is an easter egg
+          </p>
+
+        </div>
+      </div>
+
+
+      <!-- Experiment 3 — Flood Simulation -->
+      <div class="reveal" style="transform: rotate(-1.5deg);">
+        <div class="polaroid"
+             style="transform: rotate(4deg); padding: 8px 8px 30px 8px;">
+
+          <div class="tape" style="left: 25%;"></div>
+
+          <div class="w-full h-44 bg-ink flex items-center justify-center
+                      overflow-hidden">
+
+            <div class="text-center text-paper">
+              <div class="text-5xl mb-2">🌊</div>
+              <p class="handwritten text-lg">
+                Flood Simulation
+              </p>
+            </div>
+
+          </div>
+
+          <p class="handwritten text-center mt-2 text-base text-subtle">
+            water shouldn't just rise...
+          </p>
+
+        </div>
+      </div>
+
+
+      <!-- Experiment 4 — Satellite Flood Mapping -->
+      <div class="reveal" style="transform: rotate(1deg);">
+        <div class="bg-accent-blue/10 border-2 border-accent-blue/30
+                    p-5 shadow-sm relative">
+
+          <p class="handwritten text-xl font-bold text-ink mb-2">
+            Satellite → Simulation 🌍
+          </p>
+
+          <p class="text-sm text-subtle">
+            Exploring how real satellite imagery and elevation data
+            could be turned into interactive flood simulations inside
+            Unity.
+          </p>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="tech-tag">Google Earth Engine</span>
+            <span class="tech-tag">Sentinel</span>
+            <span class="tech-tag">QGIS</span>
+            <span class="tech-tag">Unity</span>
+          </div>
+
+          <span class="handwritten text-base text-accent-blue block mt-3">
+            turning maps into worlds...
+          </span>
+
+        </div>
+      </div>
+
+
+      <!-- Experiment 5 — Geospatial AR -->
+      <div class="reveal lg:mt-8 relative" style="transform: rotate(-2deg);">
+        <div class="bg-white p-5 shadow-md border border-border relative">
+
+          <div class="coffee-stain"
+               style="top: -10px; right: 20px;">
+          </div>
+
+          <p class="handwritten text-xl font-bold text-ink mb-2">
+            Geospatial AR 📍
+          </p>
+
+          <p class="text-sm text-subtle">
+            Playing around with location-aware AR, geospatial anchors,
+            3D terrain, and ways of placing digital content into the
+            real world.
+          </p>
+
+          <span class="handwritten text-base text-accent-pink block mt-3">
+            where does the digital world begin?
+          </span>
+
+        </div>
+      </div>
+
+
+      <!-- Experiment 6 — Physics -->
+      <div class="reveal" style="transform: rotate(3deg);">
+        <div class="bg-ink text-paper p-5 font-mono text-xs
+                    leading-relaxed shadow-lg relative overflow-hidden">
+
+          <div class="absolute top-0 left-0 w-full h-1 bg-accent-yellow">
+          </div>
+
+          <p class="text-accent-mint">// Physics Playground</p>
+
+          <p>Vector3 velocity;</p>
+          <p>velocity += gravity * Time.deltaTime;</p>
+          <p>ApplyMovement(velocity);</p>
+
+          <p class="text-accent-pink mt-2">
+            // why did the character fly away? 💀
+          </p>
+
+          <p class="text-accent-yellow mt-3">
+            experimenting with movement,
+            collisions & physics...
+          </p>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  <!-- Hand-drawn divider -->
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <hr class="hand-line">
+  </div>
+
+  <!-- BLENDER GALLERY -->
+<section id="blender" class="py-20 md:py-28 px-6 md:px-10">
+  <div class="max-w-7xl mx-auto">
+
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-10">
+      <div>
+        <h2 class="font-serif font-black text-4xl md:text-5xl lg:text-6xl leading-[0.9] reveal">
+          CREATIVE SCRAPS
+        </h2>
+
+        <p class="handwritten text-2xl text-subtle mt-3 reveal"
+           style="transform: rotate(-1deg);">
+          things I made just because I could ✦
+        </p>
+      </div>
+
+      <p class="text-sm text-muted mt-4 md:mt-0 reveal">
+        3D experiments · renders · random ideas
+      </p>
+    </div>
+
+
+   <!-- POLAROID GALLERY -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12 items-start">
+
+  <!-- Polaroid 01 -->
+  <div class="reveal" style="transform: rotate(-3deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 30%; top: -10px;"></div>
+
+      <img src="ren3.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+
+  <!-- Polaroid 02 -->
+  <div class="reveal lg:mt-10" style="transform: rotate(2.5deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 30%; top: -10px;"></div>
+
+      <img src="ren5.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+
+  <!-- Polaroid 03 — VIDEO -->
+  <div class="reveal" style="transform: rotate(-1.5deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 20%; top: -10px;"></div>
+
+      <div class="relative group">
+
+        <video
+          class="w-full aspect-square object-contain"
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          onmouseenter="this.play()"
+          onmouseleave="this.pause(); this.currentTime = 0;"
+        >
+          <source src="ghost.mp4" type="video/mp4">
+        </video>
+
+        <!-- Hover hint -->
+        <div class="absolute inset-0 flex items-center justify-center
+                    pointer-events-none transition-opacity duration-300
+                    group-hover:opacity-0">
+
+          <span class="handwritten text-lg bg-white/90 px-4 py-2 shadow-md"
+                style="transform: rotate(-3deg);">
+            ▶ hover me
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Polaroid 04 -->
+  <div class="reveal lg:mt-6" style="transform: rotate(2deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 65%; top: -10px;"></div>
+
+      <img src="ver2bt.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+
+  <!-- Polaroid 05 -->
+  <div class="reveal lg:mt-14" style="transform: rotate(-2.5deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 40%; top: -10px;"></div>
+
+      <img src="mug.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+
+  <!-- Polaroid 06 -->
+  <div class="reveal" style="transform: rotate(1.5deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 25%; top: -10px;"></div>
+
+      <img src="bubble.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+
+  <!-- Polaroid 07 — VIDEO -->
+  <div class="reveal lg:mt-8" style="transform: rotate(-2deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 45%; top: -10px;"></div>
+
+      <div class="relative group">
+
+        <video
+          class="w-full aspect-square object-contain"
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          onmouseenter="this.play()"
+          onmouseleave="this.pause(); this.currentTime = 0;"
+        >
+          <source src="video.mp4" type="video/mp4">
+        </video>
+
+        <!-- Hover hint -->
+        <div class="absolute inset-0 flex items-center justify-center
+                    pointer-events-none transition-opacity duration-300
+                    group-hover:opacity-0">
+
+          <span class="handwritten text-lg bg-white/90 px-4 py-2 shadow-md"
+                style="transform: rotate(3deg);">
+            ▶ hover me
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+   <!-- Polaroid 06 -->
+  <div class="reveal" style="transform: rotate(1.5deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 25%; top: -10px;"></div>
+
+      <img src="hat.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+   <!-- Polaroid 06 -->
+  <div class="reveal" style="transform: rotate(1.5deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 25%; top: -10px;"></div>
+
+      <img src="spiderman.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+   <!-- Polaroid 06 -->
+  <div class="reveal" style="transform: rotate(1.5deg);">
+    <div class="polaroid bg-white p-3 pb-8 shadow-lg">
+
+      <div class="tape" style="left: 25%; top: -10px;"></div>
+
+      <img src="goblin.png"
+           alt="Blender render"
+           class="w-full aspect-square object-contain"
+           loading="lazy">
+
+    </div>
+  </div>
+
+</div>
+ <!-- Hand-drawn divider -->
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <hr class="hand-line">
+  </div>
+
+  <!-- EXPERIENCE -->
+<section id="experience" class="py-20 md:py-32 px-6 md:px-10">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+
+    <div class="lg:col-span-4 reveal">
+      <h2 class="font-serif font-black text-4xl md:text-5xl lg:text-6xl leading-[0.9]">
+        EXPERIENCE<br>& EDUCATION
+      </h2>
+    </div>
+
+    <div class="lg:col-span-8">
+
+      <!-- EDUCATION -->
+      <div class="timeline-item reveal">
+        <span class="handwritten text-lg text-accent-mint font-bold">
+          2023 — 2027
+        </span>
+
+        <h3 class="font-serif font-bold text-xl mt-1">
+          B.Tech — Computer Science & Engineering
+        </h3>
+
+        <p class="text-subtle text-sm mt-1">
+          Jaypee University of Engineering and Technology · Guna
+        </p>
+<p class="text-subtle text-sm mt-2">
+  Pursuing Computer Science with a strong focus on
+  <strong>AR, VR, MR, interactive 3D, and game development</strong>.
+  Building immersive experiences using Unity, C#, Blender,
+  and XR technologies alongside core software development.
+  <br>
+  <strong>CGPA: 7.65</strong>
+</p>
+
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span class="tech-tag">Computer Science</span>
+          <span class="tech-tag">AR/VR/MR</span>
+          <span class="tech-tag">Unity</span>
+          <span class="tech-tag">3D</span>
+        </div>
+      </div>
+
+
+      <!-- CARTOXR -->
+      <div class="timeline-item reveal">
+        <span class="handwritten text-lg text-accent-blue font-bold">
+          Mar — Aug 2026
+        </span>
+
+        <h3 class="font-serif font-bold text-xl mt-1">
+          XR Developer Intern
+        </h3>
+
+        <p class="text-subtle text-sm mt-1">
+          CartoXR Research Centre and Consultancy LLP · Remote
+        </p>
+
+        <p class="text-subtle text-sm mt-2">
+          Worked on <strong>geospatial XR and immersive 3D visualization</strong>,
+          building an interactive flood simulation using Cesium ion terrain
+          and Blender-created 3D environments. Also developed an
+          Immersal-based indoor navigation application using spatial
+          localization and map-based navigation.
+        </p>
+
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span class="tech-tag">Unity</span>
+          <span class="tech-tag">Cesium ion</span>
+          <span class="tech-tag">Immersal</span>
+          <span class="tech-tag">Blender</span>
+          <span class="tech-tag">XR</span>
+        </div>
+      </div>
+
+
+      <!-- TECH JOSE -->
+      <div class="timeline-item reveal">
+        <span class="handwritten text-lg text-accent-pink font-bold">
+          May — Jul 2025
+        </span>
+
+        <h3 class="font-serif font-bold text-xl mt-1">
+          VR/AR Intern
+        </h3>
+
+        <p class="text-subtle text-sm mt-1">
+          Tech Jose · Remote
+        </p>
+
+        <p class="text-subtle text-sm mt-2">
+          Developed an <strong>AR food visualization system</strong>
+          with optimized 3D assets, interactive cart functionality,
+          and multi-scene data flow for digital menu experiences.
+          Integrated Firebase Firestore with Unity for real-time
+          table booking and synchronized order tracking.
+        </p>
+
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span class="tech-tag">Unity</span>
+          <span class="tech-tag">AR</span>
+          <span class="tech-tag">Firebase</span>
+          <span class="tech-tag">3D</span>
+        </div>
+      </div>
+
+
+      <!-- DIC -->
+      <div class="timeline-item reveal">
+        <span class="handwritten text-lg text-accent-yellow font-bold">
+          2026 — Present
+        </span>
+
+        <h3 class="font-serif font-bold text-xl mt-1">
+          Deputy General Secretary
+        </h3>
+
+        <p class="text-subtle text-sm mt-1">
+          Development & Innovation Center · JUET
+        </p>
+
+        <p class="text-subtle text-sm mt-2">
+          Contributing to student-led <strong>technology and innovation
+          initiatives</strong>, with a focus on emerging technologies,
+          interactive systems, and <strong>AR/VR/MR</strong>. Helping
+          coordinate technical activities, projects, events, and
+          collaborative innovation initiatives.
+        </p>
+
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span class="tech-tag">Leadership</span>
+          <span class="tech-tag">AR/VR/MR</span>
+          <span class="tech-tag">Innovation</span>
+          <span class="tech-tag">Technology</span>
+        </div>
+      </div>
+
+
+      <!-- CODESRIJAN -->
+      <div class="timeline-item reveal">
+        <span class="handwritten text-lg text-accent-ink font-bold">
+          Apr 2026
+        </span>
+
+        <h3 class="font-serif font-bold text-xl mt-1">
+          Co-Organizer & Design Lead
+        </h3>
+
+        <p class="text-subtle text-sm mt-1">
+          CodeSrijan National Hackathon 2026 · JUET
+        </p>
+
+        <p class="text-subtle text-sm mt-2">
+          Coordinated a national-level hackathon with
+          <strong>150+ participants</strong> as part of a
+          <strong>50+ member organizing team</strong>. Led design and
+          branding, creating promotional content and digital assets
+          while contributing to event planning, delegation, and execution.
+        </p>
+
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span class="tech-tag">Leadership</span>
+          <span class="tech-tag">Design</span>
+          <span class="tech-tag">Branding</span>
+          <span class="tech-tag">Event Management</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+  <!-- Hand-drawn divider -->
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <hr class="hand-line">
+  </div>
+
+  <!-- CONTACT -->
+  <section id="contact" class="py-20 md:py-32 px-6 md:px-10 relative">
+    <div class="max-w-7xl mx-auto text-center">
+      <h2 class="font-serif font-black text-5xl md:text-7xl lg:text-8xl leading-[0.85] mb-4 reveal">
+        LET'S BUILD<br>SOMETHING
+      </h2>
+      <p class="text-lg md:text-xl text-subtle max-w-2xl mx-auto mb-10 reveal">
+        Interested in interactive experiences, games, XR or just interesting problems? I'd love to hear about them.
+      </p>
+
+      <div class="flex flex-wrap justify-center gap-4 mb-8 reveal">
+        <a href="mailto:kavya.singhal.dev@gmail.com" class="btn-label btn-yellow" style="transform: rotate(-1deg);">GET IN TOUCH →</a>
+        <a href="https://drive.google.com/file/d/1WiPqX0V5dohNano7JAaPGxFGsn7sE3Fz/view?usp=drive_link" class="btn-label btn-outline" style="transform: rotate(0.5deg);">RESUME →</a>
+        <a href="www.linkedin.com/in/kavyasinghal/" class="btn-label btn-outline" style="transform: rotate(1deg);">LINKEDIN →</a>
+        <a href="#" class="btn-label btn-outline" style="transform: rotate(-0.8deg);">GITHUB →</a>
+      </div>
+
+      <p class="handwritten text-3xl text-accent-pink reveal" style="transform: rotate(-3deg);">say hi :)</p>
+
+      <!-- Decorative -->
+      <div class="mt-16 flex justify-center gap-4 opacity-40 reveal">
+        <span class="handwritten text-xl" style="transform: rotate(8deg);">✦</span>
+        <span class="handwritten text-xl" style="transform: rotate(-5deg);">✎</span>
+        <span class="handwritten text-xl" style="transform: rotate(3deg);">✦</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-6 md:px-10 border-t border-border">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted">
+      <p>© 2024 Kavya Singhal. Built with care & too much coffee.</p>
+      <p class="handwritten text-lg">Just live your life with happiness ✦</p>
+    </div>
+  </footer>
+
+  <!-- PROJECT MODAL -->
+  <div id="project-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Project detail">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <div id="modal-inner">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+ <script>
+  // Project data
+  const projects = [
+    {
+      id: 0,
+      title: 'Yes Chef',
+      number: 'PROJECT 01',
+
+      overview:
+        'A fast-paced first-person cooking game built in Unity where players prepare food, interact with kitchen objects, and complete customer orders.',
+
+      problem:
+        'The project was created to explore how core Unity gameplay systems can come together to create a complete and interactive game experience.',
+
+      process:
+        'Designed a simple cooking loop around picking up ingredients, placing objects, preparing food, chopping ingredients, and completing customer orders. The project was developed iteratively by building and testing each interaction system.',
+
+      development:
+        'Built in Unity using C#. Implemented raycast-based interaction, object pickup and placement, chopping mechanics, customer orders, health systems, UI elements, and overall gameplay management.',
+
+      technology: [
+        'Unity',
+        'C#',
+        'Gameplay',
+        'Unity UI',
+        'Physics'
+      ],
+
+      challenges:
+        'Making object interactions feel reliable while preventing objects from clipping through tables and other kitchen surfaces. Another challenge was keeping the different gameplay systems connected without making the interaction flow complicated.',
+
+      solution:
+        'Used raycasting and controlled placement points for object interaction. Structured the gameplay into separate systems for objects, chopping, customers, health, and game management.',
+
+      result:
+        'A playable cooking-game prototype demonstrating Unity gameplay programming, object interaction, physics, UI, and game-state management.',
+
+      gallery: [
+        'project/p1.png',
+        'project/p6.png',
+        'project/p9.png',
+        'project/p10.png',
+        'project/p8.png',
+        'project/p7.png'
+      ],
+
+      demo: 'project/vp1.mp4',
+
+      learnings:
+        'Building a small complete game helped me understand how individual Unity systems such as interaction, physics, UI, and gameplay logic work together as one experience.'
+    },
+
+
+    {
+      id: 1,
+      title: 'VR Flood Simulation',
+      number: 'PROJECT 02',
+
+      overview:
+        'An immersive VR flood and disaster-management simulation exploring how real-world environments, flood visualization, and emergency preparedness can be presented through an interactive virtual experience.',
+
+      problem:
+        'Floods can be difficult to understand through conventional maps or static information. The project explored how immersive VR and 3D visualization could help users experience a flood scenario while learning about safety precautions and emergency response.',
+
+      process:
+        'The project combined a real-world geospatial environment with an indoor VR scenario. Cesium was used to visualize large-scale 3D geographic data, including a flood visualization around the Melbourne Museum. A separate classroom environment was created to demonstrate how flooding could progress through an indoor space.',
+
+      development:
+        'Built in Unity using the XR Interaction Toolkit and Cesium. Developed the VR environment, player interaction, environmental boundaries, and flooding sequence. A custom water shader was created in Unity to control the visual appearance and movement of the simulated flood water.',
+
+      technology: [
+        'Unity',
+        'VR',
+        'XR Interaction Toolkit',
+        'Cesium',
+        'C#',
+        'Shader',
+        '3D'
+      ],
+
+      challenges:
+        'Representing flooding at both a large geographic scale and an indoor environmental scale while keeping the experience understandable and immersive. The water visualization also needed to look convincing inside the VR environment.',
+
+      solution:
+        'Used Cesium for geospatial 3D visualization and created a dedicated classroom scenario for the indoor flood simulation. Developed a custom Unity water shader to create the visual appearance of the rising flood water. The experience also incorporated safety precautions and emergency-response concepts to give the simulation a practical disaster-management context.',
+
+      result:
+        'A VR flood simulation combining geospatial visualization, immersive environmental simulation, and disaster-safety awareness. The project demonstrates the use of Cesium for real-world 3D environments alongside custom Unity development for an indoor flooding scenario.',
+
+      gallery: [
+        'YOUR_MELBOURNE_MUSEUM_FLOOD_IMAGE.jpg',
+        'YOUR_CLASSROOM_FLOOD_IMAGE.jpg',
+        'YOUR_WATER_SHADER_IMAGE.jpg'
+      ],
+
+      demo: 'YOUR_FLOOD_SIMULATION_DEMO',
+
+      learnings:
+        'The project helped explore how XR can be used beyond entertainment for visualization and disaster-management scenarios. Working with Cesium also provided experience with large-scale geospatial environments, while creating the custom water shader strengthened understanding of real-time visual effects in Unity.'
+    },
+
+
+    {
+      id: 2,
+      title: 'Dare Tiles AR',
+      number: 'PROJECT 03',
+
+      overview:
+        'A marker-based AR game created for Tachyon, our college technical fest. Players scan a real-world poster to reveal a virtual dare and then perform the challenge in the physical environment.',
+
+      problem:
+        'The idea was to turn a simple physical poster into an interactive AR experience that could attract people at a college event and encourage them to participate rather than simply view an AR effect.',
+
+      process:
+        'Designed the experience around a physical poster used as an AR image target. When a participant scanned the poster, a virtual dare was displayed on top of it. Players then performed the displayed challenge in the real world.',
+
+      development:
+        'Built in Unity using C# and Vuforia marker-based AR. Used image-target tracking to recognize the physical poster and trigger the corresponding virtual dare and gameplay interaction.',
+
+      technology: [
+        'Unity',
+        'Vuforia',
+        'Marker-based AR',
+        'C#',
+        'AR'
+      ],
+
+      challenges:
+        'The experience needed to work reliably in a busy event environment while keeping the interaction quick enough for many participants to understand and play.',
+
+      solution:
+        'Used a physical poster as the interaction point and kept the AR gameplay loop simple: scan the marker, receive a dare, and perform it. This made the experience easy to understand and encouraged participants to interact with it immediately.',
+
+      result:
+        'Created for Tachyon, the college technical fest, where the AR game attracted more than 200 participants and became an interactive event experience rather than just a demonstration of AR technology.',
+
+      gallery: [
+        'YOUR_DARE_TILES_IMAGE_1.jpg',
+        'YOUR_DARE_TILES_IMAGE_2.jpg'
+      ],
+
+      demo: 'YOUR_DARE_TILES_DEMO',
+
+      learnings:
+        'Event-based AR needs to be fast, intuitive, and engaging. Designing the experience around a physical marker helped connect the digital interaction with the real-world environment and made the AR experience accessible to a large number of participants.'
+    },
+
+
+    {
+      id: 3,
+      title: 'VR Home Decorator',
+      number: 'PROJECT 04',
+
+      overview:
+        'An interactive VR home-decoration experience where users can explore a virtual space and experiment with placing and arranging objects in an immersive environment.',
+
+      problem:
+        'Traditional 2D interfaces can make it difficult to understand scale, spacing, and how furniture or objects will feel within a room. The project explores how VR can make interior arrangement more spatial and interactive.',
+
+      process:
+        'Created a virtual home environment and designed interactions around exploring the space and arranging 3D objects. Focused on making the experience feel natural while giving users control over their virtual surroundings.',
+
+      development:
+        'Built in Unity using C# with VR interaction systems. Created and prepared 3D assets using Blender and implemented interactive object placement and manipulation inside the virtual environment.',
+
+      technology: [
+        'Unity',
+        'VR',
+        'C#',
+        'Blender',
+        'XR Interaction Toolkit',
+        '3D'
+      ],
+
+      challenges:
+        'Making object interaction and placement feel natural in VR while maintaining a comfortable and understandable user experience.',
+
+      solution:
+        'Used VR-based interaction to let users directly work with objects in the environment instead of relying on conventional menus and 2D controls.',
+
+      result:
+        'A functional VR home-decoration prototype demonstrating immersive spatial interaction, 3D object manipulation, Unity development, and Blender-based asset creation.',
+
+      gallery: [
+        'YOUR_HOME_DECORATOR_IMAGE_1.jpg',
+        'YOUR_HOME_DECORATOR_IMAGE_2.jpg',
+        'YOUR_HOME_DECORATOR_IMAGE_3.jpg'
+      ],
+
+      demo: 'YOUR_HOME_DECORATOR_DEMO',
+
+      learnings:
+        'VR interfaces work best when interactions take advantage of the user’s physical understanding of objects. Direct spatial interaction can make design and visualization experiences much more intuitive.'
+    }
+  ];
+
+
+  // DOM Elements
+  const modal = document.getElementById('project-modal');
+  const modalInner = document.getElementById('modal-inner');
+  const modalClose = document.getElementById('modal-close');
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  const navbar = document.getElementById('navbar');
+  const projectCards = document.querySelectorAll('.project-card');
+
+
+  // Mobile menu toggle
+  menuToggle.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.contains('open');
+
+    mobileMenu.classList.toggle('open');
+    menuIcon.textContent = isOpen ? '☰' : '✕';
+  });
+
+
+  // Close mobile menu on link click
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      menuIcon.textContent = '☰';
+    });
+  });
+
+
+  // Navbar background on scroll
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      navbar.style.background = 'rgba(247,243,235,0.92)';
+      navbar.style.backdropFilter = 'blur(10px)';
+      navbar.style.boxShadow = '0 1px 0 rgba(0,0,0,0.04)';
+    } else {
+      navbar.style.background = 'transparent';
+      navbar.style.backdropFilter = 'none';
+      navbar.style.boxShadow = 'none';
+    }
+  });
+
+
+  // Open project modal
+  projectCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const projectId = parseInt(card.getAttribute('data-project'));
+      openProjectModal(projectId);
+    });
+  });
+
+
+  function openProjectModal(projectId) {
+    const project = projects[projectId];
+
+    if (!project) return;
+
+
+    modalInner.innerHTML = `
+      <div class="mb-8">
+        <span class="handwritten text-lg text-muted block mb-2">
+          ${project.number}
+        </span>
+
+        <h2 class="font-serif font-black text-3xl md:text-5xl leading-tight">
+          ${project.title}
+        </h2>
+      </div>
+
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+
+        <div class="md:col-span-2">
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Overview
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.overview}
+          </p>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Problem
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.problem}
+          </p>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Process
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.process}
+          </p>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Development
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.development}
+          </p>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Technology
+          </h3>
+
+          <div class="flex flex-wrap gap-2 mb-6">
+            ${project.technology.map(t => `
+              <span class="tech-tag">
+                ${t}
+              </span>
+            `).join('')}
+          </div>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Challenges
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.challenges}
+          </p>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Solution
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.solution}
+          </p>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Result
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.result}
+          </p>
+
+
+          <h3 class="font-serif font-bold text-xl mb-2">
+            Learnings
+          </h3>
+
+          <p class="text-subtle leading-relaxed mb-6">
+            ${project.learnings}
+          </p>
+
+        </div>
+
+
+        <div class="md:col-span-1">
+
+          <div class="sticky top-8 space-y-6">
+
+            <div
+              class="polaroid"
+              style="transform: rotate(-1deg); padding: 8px 8px 24px 8px;"
+            >
+
+              <div
+                class="tape"
+                style="left: 40%;"
+              ></div>
+
+              <img
+                src="${project.gallery[0]}"
+                alt="${project.title}"
+                class="w-full h-auto object-contain cursor-zoom-in"
+                loading="lazy"
+                onclick="openImageViewer('${project.gallery[0]}')"
+              >
+
+            </div>
+
+            <p class="handwritten text-lg text-subtle text-center">
+              project snapshot 📸
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- GALLERY -->
+
+      <div class="mb-10">
+
+        <h3 class="font-serif font-bold text-xl mb-4">
+          Gallery
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+          ${project.gallery.map((img, index) => `
+            <div
+              class="group relative bg-white border-2 border-ink p-2 shadow-md cursor-zoom-in"
+              style="transform: rotate(${index % 2 === 0 ? '-1deg' : '1deg'});"
+              onclick="openImageViewer('${img}')"
+            >
+
+              <div class="overflow-hidden bg-paper">
+
+                <img
+                  src="${img}"
+                  alt="${project.title} — image ${index + 1}"
+                  class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                  loading="lazy"
+                >
+
+              </div>
+
+
+              <div
+                class="absolute inset-0 flex items-center justify-center
+                       bg-black/0 group-hover:bg-black/10
+                       transition-all duration-300 pointer-events-none"
+              >
+
+                <span
+                  class="opacity-0 group-hover:opacity-100
+                         bg-white/95 px-4 py-2 shadow-md
+                         handwritten text-lg transition-opacity duration-300"
+                >
+                  ↗ view
+                </span>
+
+              </div>
+
+            </div>
+          `).join('')}
+
+        </div>
+
+      </div>
+
+
+      <!-- DEMO VIDEO -->
+
+      <div class="mb-6">
+
+        <h3 class="font-serif font-bold text-xl mb-4">
+          Demo
+        </h3>
+
+        <div
+          class="overflow-hidden border-2 border-ink bg-black relative"
+          style="transform: rotate(-0.3deg);"
+        >
+
+          <video
+            class="w-full max-h-[600px] object-contain"
+            controls
+            playsinline
+            preload="metadata"
+          >
+
+            <source
+              src="${project.demo}"
+              type="video/mp4"
+            >
+
+            Your browser does not support video playback.
+
+          </video>
+
+        </div>
+
+      </div>
+    `;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+
+  // FULL-SIZE IMAGE VIEWER
+
+  function openImageViewer(imageSrc) {
+
+    const viewer = document.createElement('div');
+
+    viewer.id = 'image-viewer';
+
+    viewer.className =
+      'fixed inset-0 z-[2000] bg-black/90 flex items-center justify-center p-4 cursor-zoom-out';
+
+
+    viewer.innerHTML = `
+
+      <button
+        class="absolute top-5 right-6 text-white text-4xl
+               font-light hover:opacity-70 transition-opacity z-10"
+        onclick="document.getElementById('image-viewer').remove()"
+        aria-label="Close image"
+      >
+        ×
+      </button>
+
+
+      <img
+        src="${imageSrc}"
+        alt="Full size project image"
+        class="max-w-full max-h-[92vh] w-auto h-auto
+               object-contain shadow-2xl"
+      />
+
+    `;
+
+
+    viewer.addEventListener('click', (event) => {
+
+      if (event.target === viewer) {
+        viewer.remove();
+      }
+
+    });
+
+
+    document.body.appendChild(viewer);
+  }
+
+
+  // FULL-SIZE VIDEO VIEWER
+
+  function openVideoViewer(videoSrc) {
+
+    if (
+      !videoSrc ||
+      videoSrc === 'YOUR_YES_CHEF_DEMO' ||
+      videoSrc === 'YOUR_FLOOD_SIMULATION_DEMO' ||
+      videoSrc === 'YOUR_DARE_TILES_DEMO' ||
+      videoSrc === 'YOUR_HOME_DECORATOR_DEMO'
+    ) {
+      return;
+    }
+
+
+    const viewer = document.createElement('div');
+
+    viewer.id = 'video-viewer';
+
+    viewer.className =
+      'fixed inset-0 z-[2000] bg-black/95 flex items-center justify-center p-4';
+
+
+    viewer.innerHTML = `
+
+      <button
+        class="absolute top-5 right-6 text-white text-4xl
+               font-light hover:opacity-70 transition-opacity z-10"
+        onclick="document.getElementById('video-viewer').remove()"
+        aria-label="Close video"
+      >
+        ×
+      </button>
+
+
+      <video
+        class="max-w-full max-h-[92vh] w-auto h-auto object-contain shadow-2xl"
+        controls
+        autoplay
+        playsinline
+      >
+
+        <source
+          src="${videoSrc}"
+          type="video/mp4"
+        >
+
+        Your browser does not support video playback.
+
+      </video>
+
+    `;
+
+
+    viewer.addEventListener('click', (event) => {
+
+      if (event.target === viewer) {
+        viewer.remove();
+      }
+
+    });
+
+
+    document.body.appendChild(viewer);
+  }
+
+
+  // Close modal
+
+  modalClose.addEventListener('click', closeModal);
+
+
+  modal.addEventListener('click', (e) => {
+
+    if (e.target === modal) {
+      closeModal();
+    }
+
+  });
+
+
+  document.addEventListener('keydown', (e) => {
+
+    if (
+      e.key === 'Escape' &&
+      modal.classList.contains('active')
+    ) {
+      closeModal();
+    }
+
+  });
+
+
+  function closeModal() {
+
+    modal.classList.remove('active');
+
+    document.body.style.overflow = '';
+
+  }
+
+
+  // Scroll reveal
+
+  const revealElements = document.querySelectorAll('.reveal');
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -60px 0px',
+    threshold: 0.1
+  };
+
+
+  const observer = new IntersectionObserver((entries) => {
+
+    entries.forEach(entry => {
+
+      if (entry.isIntersecting) {
+
+        entry.target.classList.add('is-visible');
+
+        observer.unobserve(entry.target);
+
+      }
+
+    });
+
+  }, observerOptions);
+
+
+  revealElements.forEach(el => observer.observe(el));
+
+
+  // Also observe stickers for hover-triggered rotation resets
+
+  document.querySelectorAll('.sticker').forEach(sticker => {
+
+    sticker.addEventListener('mouseenter', () => {
+
+      sticker.style.transition =
+        'transform 0.3s ease, box-shadow 0.3s ease';
+
+    });
+
+
+    sticker.addEventListener('mouseleave', () => {
+
+      sticker.style.transition =
+        'transform 0.5s ease, box-shadow 0.5s ease';
+
+    });
+
+  });
+
+
+  // Subtle parallax on hero polaroid (mouse move)
+
+  const heroSection = document.getElementById('hero');
+
+  const heroPolaroid = heroSection.querySelector('.polaroid');
+
+
+  if (heroPolaroid && window.innerWidth > 1024) {
+
+    heroSection.addEventListener('mousemove', (e) => {
+
+      const rect = heroSection.getBoundingClientRect();
+
+      const x =
+        (e.clientX - rect.left) / rect.width - 0.5;
+
+      const y =
+        (e.clientY - rect.top) / rect.height - 0.5;
+
+      const baseRotation = 3;
+
+      const moveX = x * 8;
+
+      const moveY = y * 6;
+
+      const rotate = baseRotation + y * 5;
+
+
+      heroPolaroid.style.transform =
+        `translate(${moveX}px, ${moveY}px) rotate(${rotate}deg)`;
+
+    });
+
+
+    heroSection.addEventListener('mouseleave', () => {
+
+      heroPolaroid.style.transform = 'rotate(3deg)';
+
+      heroPolaroid.style.transition =
+        'transform 0.6s ease';
+
+
+      setTimeout(() => {
+
+        heroPolaroid.style.transition =
+          'transform 0.5s ease, box-shadow 0.5s ease';
+
+      }, 600);
+
+    });
+
+  }
+
+
+  // Smooth scroll for all anchor links
+
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+
+    anchor.addEventListener('click', function(e) {
+
+      const targetId = this.getAttribute('href');
+
+      if (targetId === '#') return;
+
+
+      const target =
+        document.querySelector(targetId);
+
+
+      if (target) {
+
+        e.preventDefault();
+
+
+        const navHeight =
+          navbar.offsetHeight + 20;
+
+
+        const targetPosition =
+          target.getBoundingClientRect().top +
+          window.pageYOffset -
+          navHeight;
+
+
+        window.scrollTo({
+
+          top: targetPosition,
+
+          behavior: 'smooth'
+
+        });
+
+      }
+
+    });
+
+  });
+
+
+  console.log(
+    '%c✨ Kavya Singhal Portfolio %c— handcrafted with care',
+    'font-family: Caveat, cursive; font-size: 1.5rem; color: #4a90d9;',
+    'font-size: 0.8rem; color: #8a8580;'
+  );
+
+
+  console.log(
+    '%cFeel free to explore, remix, and make it yours.',
+    'font-family: Inter, sans-serif; font-size: 0.9rem; color: #4a4a4a;'
+  );
+
+</script>
+</body>
+</html>
