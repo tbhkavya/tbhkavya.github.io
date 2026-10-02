@@ -459,6 +459,67 @@
       border-left-color: transparent;
     }
 
+    /* SECRET EASTER EGG */
+.easter-egg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 18px;
+
+  background: #fff4a8;
+  color: #111;
+
+  border: 2px dashed #111;
+  box-shadow: 4px 5px 0 rgba(0,0,0,0.12);
+
+  font-family: inherit;
+  font-weight: 700;
+  text-decoration: none;
+
+  transform: rotate(-2deg);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.easter-egg-btn:hover {
+  transform: rotate(1deg) translateY(-4px) scale(1.04);
+  box-shadow: 7px 9px 0 rgba(0,0,0,0.16);
+  background: #ffd6f3;
+}
+
+.easter-sparkle {
+  font-size: 20px;
+  animation: easterSparkle 1.8s ease-in-out infinite;
+}
+
+.easter-text {
+  font-family: "Comic Sans MS", "Bradley Hand", cursive;
+  font-size: 16px;
+}
+
+.easter-arrow {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.easter-egg-btn:hover .easter-arrow {
+  transform: translate(3px, -3px);
+}
+
+@keyframes easterSparkle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(15deg) scale(1.25);
+  }
+}
+
     /* Responsive */
     @media (max-width: 768px) {
       .polaroid { transform: rotate(1deg) !important; }
@@ -1016,17 +1077,20 @@
 
           <!-- Snapchat Easter Egg -->
           <a href="https://creator.snapchat.com/creator/Z6ddMmhQQJBWkERNP-p3Qg"
-             target="_blank"
-             rel="noopener noreferrer"
-             class="inline-flex items-center gap-2 handwritten text-base
-                    text-accent-pink hover:underline cursor-pointer">
+   target="_blank"
+   rel="noopener noreferrer"
+   class="easter-egg-btn"
+   aria-label="Discover my secret Snapchat AR filter">
 
-            👻 find my little experiments →
-          </a>
+  <span class="easter-sparkle">✦</span>
 
-          <p class="handwritten text-sm text-muted mt-3">
-            psst... this is an easter egg
-          </p>
+  <span class="easter-text">
+    found something 👀
+  </span>
+
+  <span class="easter-arrow">↗</span>
+
+</a>
 
         </div>
       </div>
@@ -1558,13 +1622,13 @@
         Interested in interactive experiences, games, XR or just interesting problems? I'd love to hear about them.
       </p>
 
-     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=kavya.singhal.dev@gmail.com"
-   target="_blank"
-   rel="noopener noreferrer"
-   class="btn-label btn-yellow"
-   style="transform: rotate(-1deg);">
+    <button
+  id="contactButton"
+  onclick="copyContactInfo()"
+  class="btn-label btn-yellow"
+  style="transform: rotate(-1deg);">
   GET IN TOUCH →
-</a>
+</button>
   <a href="https://drive.google.com/file/d/1WiPqX0V5dohNano7JAaPGxFGsn7sE3Fz/view"
      target="_blank"
      rel="noopener noreferrer"
@@ -2433,6 +2497,25 @@
     'font-family: Inter, sans-serif; font-size: 0.9rem; color: #4a4a4a;'
   );
 
+</script>
+
+<script>
+function copyContactInfo() {
+  const email = "kavya.singhal.dev@gmail.com";
+  const phone = "+91 9893346042";
+
+  navigator.clipboard.writeText(
+    `Email: ${email}\nPhone: ${phone}`
+  );
+
+  const button = document.getElementById("contactButton");
+
+  button.textContent = "COPIED! ✦";
+
+  setTimeout(() => {
+    button.textContent = "GET IN TOUCH →";
+  }, 1800);
+}
 </script>
 </body>
 </html>
